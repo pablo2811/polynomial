@@ -1,6 +1,5 @@
 #include "poly.h"
 #include <stdlib.h>
-#include <stdio.h>
 
 Poly addNumberToPoly(const Poly *p, poly_coeff_t x) {
     Poly result = PolyClone(p);
@@ -118,8 +117,10 @@ Poly PolyNeg(const Poly *p) {
 }
 
 Poly PolySub(const Poly *p, const Poly *q) {
-    Poly result;
-    return result;
+    Poly negative = PolyNeg(q);
+    Poly sum = PolyAdd(p,&negative);
+    PolyDestroy(&negative);
+    return sum;
 }
 
 poly_exp_t PolyDegBy(const Poly *p, size_t var_idx) {
