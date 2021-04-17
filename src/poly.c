@@ -216,6 +216,7 @@ Poly PolyNeg(const Poly *p) {
         result.arr = NULL;
     } else {
         result.arr = malloc(sizeof(Mono) * (p->size));
+        result.size = p->size;
         for (size_t i = 0; i < p->size; i++) {
             result.arr[i].p = PolyNeg(&p->arr[i].p);
             result.arr[i].exp = (p->arr + i)->exp;
