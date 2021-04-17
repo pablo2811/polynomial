@@ -1,18 +1,9 @@
 #include "poly.h"
 #include <stdlib.h>
-#include <stdio.h>
-
 
 void insertMonoToPoly(Poly *p, Mono m) {
     p->arr = realloc(p->arr, (p->size + 1) * sizeof(Mono));
     p->arr[p->size] = m;
-    size_t i = p->size;
-    while (i >= 1 && MonoGetExp(&(p->arr[i])) < MonoGetExp(&(p->arr[i - 1]))) {
-        Mono tmp = p->arr[i - 1];
-        p->arr[i - 1] = p->arr[i];
-        p->arr[i] = tmp;
-        i--;
-    }
     (p->size)++;
 }
 
@@ -34,7 +25,7 @@ void PolyDestroy(Poly *p) {
     }
 }
 
-int comparator_exponents(const void *p1, const void *p2) {
+poly_exp_t comparator_exponents(const void *p1, const void *p2) {
     Mono *mono1 = (Mono *) p1;
     Mono *mono2 = (Mono *) p2;
     return mono1->exp - mono2->exp;
@@ -72,18 +63,13 @@ void Simplify(Poly *poly) {
     }
     Mono *simplified = NULL;
     size_t simplified_size = 0;
-    bool poly_zero = true;
     for (size_t i = 0; i < poly->size; i++) {
         if (!PolyIsZero(&poly->arr[i].p)) {
             simplified = realloc(simplified, (simplified_size + 1) * sizeof(Mono));
             simplified[simplified_size] = MonoClone(poly->arr + i);
             simplified_size++;
-//            poly_zero = false;
         }
     }
-//    if (poly_zero && !PolyIsCoeff(poly)) {
-//        poly->coeff = 0;
-//    }
     MonoDestroy(poly->arr);
     poly->arr = simplified;
     poly->size = simplified_size;
@@ -105,10 +91,10 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
         result.size = 0;
         for (size_t i = 0; i < min(p->size, q->size); i++) {
             if (MonoGetExp(p->arr + i) == MonoGetExp(q->arr + i)) {
-                result.arr = realloc(result.arr, (result.size + 1) * sizeof(Mono));
-                result.arr[result.size].p = PolyAdd(&((p->arr + i)->p), &((q->arr + i)->p));
-                result.arr[result.size].exp = MonoGetExp(p->arr + i);
-                (result.size)++;
+                Poly add_result = PolyAdd(&((p->arr + i)->p), &((q->arr + i)->p));
+                if (!PolyIsZero(&add_result)) {
+                    insertMonoToPoly(&result, MonoFromPoly(&add_result, MonoGetExp(p->arr + i)));
+                }
             } else {
                 insertMonoToPoly(&result, MonoClone(p->arr + i));
                 insertMonoToPoly(&result, MonoClone(q->arr + i));
@@ -125,65 +111,60 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
     Poly *old_result = &result;
     Poly final_result = PolyAddMonos(result.size, result.arr);
     PolyDestroy(old_result);
-    Simplify(&final_result);
+//    Simplify(&final_result);
     return final_result;
 }
 
 
 Poly PolyAddMonos(size_t count, const Mono *monos) {
     Poly result;
-    result.arr = malloc(count * sizeof(Mono));
+    Mono *monos_copy = malloc(count * sizeof(Mono));
     for (size_t i = 0; i < count; i++) {
-        result.arr[i] = MonoClone(&monos[i]);
+        monos_copy[i] = MonoClone(&monos[i]);
     }
-    qsort(result.arr, count, sizeof(Mono), comparator_exponents);
+    qsort(monos_copy, count, sizeof(Mono), comparator_exponents);
     size_t i = 0;
     Mono *temp = NULL;
     size_t size_temp = 0;
     while (i < count) {
-        Poly current_sum = result.arr[i].p;
+        Poly current_sum = monos_copy[i].p;
         size_t j = i + 1;
-        while (j < count && MonoGetExp(result.arr + j) == MonoGetExp(result.arr + i)) {
+        while (j < count && MonoGetExp(monos_copy + j) == MonoGetExp(monos_copy + i)) {
             Poly *ptr = &current_sum;
-            Poly temp_poly = PolyAdd(&current_sum, &result.arr[j].p);
+            Poly temp_poly = PolyAdd(&current_sum, &monos_copy[j].p);
             PolyDestroy(ptr);
             current_sum = temp_poly;
             j++;
         }
-        Simplify(&current_sum);
+//        Simplify(&current_sum);
         if (!PolyIsZero(&current_sum)) {
             temp = realloc(temp, (size_temp + 1) * sizeof(Mono));
-            temp[size_temp] = MonoFromPoly(&current_sum, result.arr[i].exp);
+            temp[size_temp] = MonoFromPoly(&current_sum, monos_copy[i].exp);
             size_temp++;
         }
         i = j;
     }
-
+//    MonoDestroy(monos_copy);
     if (size_temp == 1 && temp->exp == 0 && PolyIsCoeff(&temp[0].p)) {
         result.arr = NULL;
         result.coeff = temp[0].p.coeff;
         return result;
     }
-//    MonoDestroy(result.arr);
-//    if (size_temp == 1 && temp->exp == 0) {
-//        result = PolyFromCoeff(temp->p.coeff);
-//    } else {
     result.arr = temp;
     result.size = size_temp;
-//    }
-//    qsort(result.arr, count, sizeof(Mono), comparator_exponents);
     return result;
 }
 
-Poly PolyCoefMul(const Poly *p, const Poly *q) {
+Poly PolyCoefMul(poly_coeff_t m, const Poly *q) { // q - nie liczba, p - liczba
     Poly result;
     result.arr = malloc((q->size) * sizeof(Mono));
     for (size_t i = 0; i < q->size; i++) {
-        Poly number = PolyFromCoeff(p->coeff);
+        Poly number = PolyFromCoeff(m);
         result.arr[i].p = PolyMul(&(q->arr->p), &number);
         result.arr[i].exp = q->arr->exp;
     }
     result.size = q->size;
+    Simplify(&result);
     return result;
 }
 
@@ -193,25 +174,26 @@ Poly PolyMul(const Poly *p, const Poly *q) {
         result.arr = NULL;
         result.coeff = p->coeff * q->coeff;
     } else if (PolyIsCoeff(p) && !PolyIsCoeff(q)) {
-        return PolyCoefMul(p, q);
+        return PolyCoefMul(p->coeff, q);
     } else if (!PolyIsCoeff(p) && PolyIsCoeff(q)) {
-        return PolyCoefMul(q, p);
+        return PolyCoefMul(q->coeff, p);
     } else {
-        result.arr = malloc((p->size) * (q->size) * sizeof(Mono));
-        result.size = (p->size) * (q->size);
+        Mono *tmp = malloc((p->size) * (q->size) * sizeof(Mono));
         for (size_t i = 0; i < p->size; i++) {
             for (size_t j = 0; j < q->size; j++) {
-                result.arr[i * q->size + j].p = PolyMul(&((p->arr + i)->p), &((q->arr + j)->p));
-                result.arr[i * q->size + j].exp = MonoGetExp(p->arr + i) + MonoGetExp(q->arr + j);
+                Poly multiplication_result = PolyMul(&((p->arr + i)->p), &((q->arr + j)->p));
+                poly_exp_t exponent = MonoGetExp(p->arr + i) + MonoGetExp(q->arr + j);
+                if (!PolyIsZero(&multiplication_result)) {
+                    tmp[i * q->size + j] = MonoFromPoly(&multiplication_result, exponent);
+                }
             }
         }
-        Poly *old_result = &result;
-        Poly final_result = PolyAddMonos(result.size, result.arr);
-        PolyDestroy(old_result);
-        Simplify(&final_result);
-        return final_result;
+        result = PolyAddMonos((p->size) * (q->size), tmp);
+        MonoDestroy(tmp);
+        Simplify(&result);
+        return result;
     }
-
+    Simplify(&result);
     return result;
 }
 
@@ -264,8 +246,28 @@ poly_exp_t PolyDegBy(const Poly *p, size_t var_idx) {
     }
 }
 
+poly_exp_t MonoDeg(Mono *m) {
+    if (PolyIsCoeff(&(m->p))) {
+        return MonoGetExp(m);
+    }
+    return PolyDeg(&(m->p)) + MonoGetExp(m);
+}
+
 poly_exp_t PolyDeg(const Poly *p) {
-    return 0;
+    if (PolyIsZero(p)) {
+        return -1;
+    }
+    if (PolyIsCoeff(p)) {
+        return 0;
+    }
+    poly_exp_t deg = -1;
+    for (size_t i = 0; i < p->size; i++) {
+        poly_exp_t current;
+        if ((current = MonoDeg(p->arr + i)) > deg) {
+            deg = current;
+        }
+    }
+    return deg;
 }
 
 bool PolyIsEq(const Poly *p, const Poly *q) {
@@ -288,8 +290,31 @@ bool PolyIsEq(const Poly *p, const Poly *q) {
     return false;
 }
 
+
+poly_coeff_t notQuickPower(poly_coeff_t x, poly_exp_t exp) {
+    poly_coeff_t result = 1;
+    for (poly_exp_t i = 0; i < exp; i++) {
+        result *= x;
+    }
+    return result;
+}
+
 Poly PolyAt(const Poly *p, poly_coeff_t x) {
-    Poly result;
+    Poly result = PolyFromCoeff(0);;
+    if (PolyIsCoeff(p)) {
+        result = PolyFromCoeff(p->coeff);
+        return result;
+    }
+    Poly current;
+    for (size_t i = 0; i < p->size; i++) {
+        poly_exp_t my_exponent = p->arr[i].exp;
+        poly_coeff_t constant = notQuickPower(x, my_exponent);
+        Poly multiplier = PolyFromCoeff(constant);
+        current = PolyMul(&multiplier, &p->arr[i].p);
+//        Poly *ptr = &result;
+        result = PolyAdd(&result, &current);
+//        PolyDestroy(ptr);
+    }
     return result;
 }
 

@@ -211,18 +211,18 @@ static bool SimpleAddMonosTest(void) {
 
 static bool SimpleMulTest(void) {
   bool res = true;
-//  res &= TestMul(C(2),
-//                 C(3),
-//                 C(6));
-//  res &= TestMul(P(C(1), 1),
-//                 C(2),
-//                 P(C(2), 1));
-//  res &= TestMul(C(3),
-//                 P(C(2), 2),
-//                 P(C(6), 2));
-//  res &= TestMul(P(C(1), 1), // x
-//                 P(C(2), 2), // 2x^2
-//                 P(C(2), 3)); // 2x^3
+  res &= TestMul(C(2),
+                 C(3),
+                 C(6));
+  res &= TestMul(P(C(1), 1),
+                 C(2),
+                 P(C(2), 1));
+  res &= TestMul(C(3),
+                 P(C(2), 2),
+                 P(C(6), 2));
+  res &= TestMul(P(C(1), 1), // x
+                 P(C(2), 2), // 2x^2
+                 P(C(2), 3)); // 2x^3
   res &= TestMul(P(C(-1), 0, C(1), 1), // -1 + x
                  P(C(1), 0, C(1), 1), // 1 + x
                  P(C(-1), 0, C(1), 2)); // -1 + x^2
@@ -249,7 +249,7 @@ static bool SimpleSubTest(void) {
                  P(P(C(1), 0, C(4), 1, C(1), 2), 1));
 }
 
-#define POLY_P P(P(C(1), 3), 0, P(C(1), 2), 2, C(1), 3)
+#define POLY_P P(P(C(1), 3), 0, P(C(1), 2), 2, C(1), 3) // y^3 + y^2*x^2 + x^3
 
 static bool SimpleDegByTest(void) {
   bool res = true;
@@ -315,9 +315,9 @@ int main() {
   assert(SimpleMulTest());
   assert(SimpleNegTest());
   assert(SimpleSubTest());
-//  assert(SimpleDegByTest());
-//  assert(SimpleDegTest());
+  assert(SimpleDegByTest());
+  assert(SimpleDegTest());
   assert(SimpleIsEqTest());
-//  assert(SimpleAtTest());
-//  assert(OverflowTest());
+  assert(SimpleAtTest());
+  assert(OverflowTest());
 }
