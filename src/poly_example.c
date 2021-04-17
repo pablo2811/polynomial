@@ -108,52 +108,52 @@ static bool TestAt(Poly a, poly_coeff_t x, Poly res) {
 
 static bool SimpleAddTest(void) {
     bool res = true;
-//    // Różne przypadki wielomian/współczynnik
-//    res &= TestAdd(C(1),
-//                   C(2),
-//                   C(3));
-//    res &= TestAdd(P(C(1), 1),
-//                   C(2),
-//                   P(C(2), 0, C(1), 1));
-//    res &= TestAdd(C(1),
-//                   P(C(2), 2),
-//                   P(C(1), 0, C(2), 2));
-//    res &= TestAdd(P(C(1), 1),
-//                   P(C(2), 2),
-//                   P(C(1), 1, C(2), 2));
-//    res &= TestAdd(C(0),
-//                   P(C(1), 1),
-//                   P(C(1), 1));
-    // Upraszczanie wielomianu
-//    res &= TestAdd(P(C(1), 1),
-//                   P(C(-1), 1),
-//                   C(0));
-//    res &= TestAdd(P(C(1), 1, C(2), 2),
-//                   P(C(-1), 1),
-//                   P(C(2), 2));
+    // Różne przypadki wielomian/współczynnik
+    res &= TestAdd(C(1),
+                   C(2),
+                   C(3));
+    res &= TestAdd(P(C(1), 1),
+                   C(2),
+                   P(C(2), 0, C(1), 1));
+    res &= TestAdd(C(1),
+                   P(C(2), 2),
+                   P(C(1), 0, C(2), 2));
+    res &= TestAdd(P(C(1), 1),
+                   P(C(2), 2),
+                   P(C(1), 1, C(2), 2));
+    res &= TestAdd(C(0),
+                   P(C(1), 1),
+                   P(C(1), 1));
+//     Upraszczanie wielomianu
+    res &= TestAdd(P(C(1), 1),
+                   P(C(-1), 1),
+                   C(0));
+    res &= TestAdd(P(C(1), 1, C(2), 2),
+                   P(C(-1), 1),
+                   P(C(2), 2));
     res &= TestAdd(P(C(2), 0, C(1), 1), // 2 + x
                    P(C(-1), 1), // -x
                    C(2)); // 2
-    // Dodawanie współczynnika i upraszczanie
-    res &= TestAdd(C(1),
-                   P(C(-1), 0, C(1), 1),
-                   P(C(1), 1));
-    res &= TestAdd(C(1),
-                   P(P(C(-1), 0, C(1), 1), 0),
-                   P(P(C(1), 1), 0));
-    res &= TestAdd(C(1),
-                   P(C(1), 0, C(2), 2),
-                   P(C(2), 0, C(2), 2));
-    res &= TestAdd(C(1),
-                   P(P(C(1), 0, C(1), 1), 0, C(2), 2),
-                   P(P(C(2), 0, C(1), 1), 0, C(2), 2));
-    res &= TestAdd(C(1),
-                   P(P(C(-1), 0, C(1), 1), 0, C(2), 2),
-                   P(P(C(1), 1), 0, C(2), 2));
-    // Dodawanie wielomianów wielu zmiennych
-    res &= TestAdd(P(P(C(1), 2), 0, P(C(2), 1), 1, C(1), 2),
-                   P(P(C(1), 2), 0, P(C(-2), 1), 1, C(1), 2),
-                   P(P(C(2), 2), 0, C(2), 2));
+//     Dodawanie współczynnika i upraszczanie
+    res &= TestAdd(C(1),  //  1
+                   P(C(-1), 0, C(1), 1), // -1 + x
+                   P(C(1), 1)); // x
+//    res &= TestAdd(C(1), // 1
+//                   P(P(C(-1), 0, C(1), 1), 0), // -1 + y
+//                   P(P(C(1), 1), 0)); // y
+//    res &= TestAdd(C(1),
+//                   P(C(1), 0, C(2), 2),
+//                   P(C(2), 0, C(2), 2));
+//    res &= TestAdd(C(1),
+//                   P(P(C(1), 0, C(1), 1), 0, C(2), 2),
+//                   P(P(C(2), 0, C(1), 1), 0, C(2), 2));
+//    res &= TestAdd(C(1),
+//                   P(P(C(-1), 0, C(1), 1), 0, C(2), 2),
+//                   P(P(C(1), 1), 0, C(2), 2));
+//    // Dodawanie wielomianów wielu zmiennych
+//    res &= TestAdd(P(P(C(1), 2), 0, P(C(2), 1), 1, C(1), 2),
+//                   P(P(C(1), 2), 0, P(C(-2), 1), 1, C(1), 2),
+//                   P(P(C(2), 2), 0, C(2), 2));
 //    res &= TestAdd(P(P(C(1), 2), 0, P(C(2), 1), 1, C(1), 2),
 //                   P(P(C(-1), 2), 0, P(C(1), 0, C(2), 1, C(1), 2), 1, C(-1), 2),
 //                   P(P(C(1), 0, C(4), 1, C(1), 2), 1));
