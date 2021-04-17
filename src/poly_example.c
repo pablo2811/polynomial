@@ -211,21 +211,21 @@ static bool SimpleAddMonosTest(void) {
 
 static bool SimpleMulTest(void) {
   bool res = true;
-  res &= TestMul(C(2),
-                 C(3),
-                 C(6));
-  res &= TestMul(P(C(1), 1),
-                 C(2),
-                 P(C(2), 1));
-  res &= TestMul(C(3),
-                 P(C(2), 2),
-                 P(C(6), 2));
-  res &= TestMul(P(C(1), 1),
-                 P(C(2), 2),
-                 P(C(2), 3));
-  res &= TestMul(P(C(-1), 0, C(1), 1),
-                 P(C(1), 0, C(1), 1),
-                 P(C(-1), 0, C(1), 2));
+//  res &= TestMul(C(2),
+//                 C(3),
+//                 C(6));
+//  res &= TestMul(P(C(1), 1),
+//                 C(2),
+//                 P(C(2), 1));
+//  res &= TestMul(C(3),
+//                 P(C(2), 2),
+//                 P(C(6), 2));
+//  res &= TestMul(P(C(1), 1), // x
+//                 P(C(2), 2), // 2x^2
+//                 P(C(2), 3)); // 2x^3
+  res &= TestMul(P(C(-1), 0, C(1), 1), // -1 + x
+                 P(C(1), 0, C(1), 1), // 1 + x
+                 P(C(-1), 0, C(1), 2)); // -1 + x^2
   res &= TestMul(P(P(C(1), 2), 0, P(C(1), 1), 1, C(1), 2),
                  P(P(C(1), 2), 0, P(C(-1), 1), 1, C(1), 2),
                  P(P(C(1), 4), 0, P(C(1), 2), 2, C(1), 4));
@@ -312,7 +312,7 @@ static bool OverflowTest(void) {
 int main() {
   assert(SimpleAddTest());
   assert(SimpleAddMonosTest());
-//  assert(SimpleMulTest());
+  assert(SimpleMulTest());
   assert(SimpleNegTest());
   assert(SimpleSubTest());
 //  assert(SimpleDegByTest());

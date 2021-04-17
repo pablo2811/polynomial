@@ -198,13 +198,20 @@ Poly PolyMul(const Poly *p, const Poly *q) {
         return PolyCoefMul(q, p);
     } else {
         result.arr = malloc((p->size) * (q->size) * sizeof(Mono));
+        result.size = (p->size) * (q->size);
         for (size_t i = 0; i < p->size; i++) {
             for (size_t j = 0; j < q->size; j++) {
                 result.arr[i * q->size + j].p = PolyMul(&((p->arr + i)->p), &((q->arr + j)->p));
-                result.arr[i * q->size + j].exp = MonoGetExp(p->arr + i) * MonoGetExp(q->arr + j);
+                result.arr[i * q->size + j].exp = MonoGetExp(p->arr + i) + MonoGetExp(q->arr + j);
             }
         }
+        Poly *old_result = &result;
+        Poly final_result = PolyAddMonos(result.size, result.arr);
+        PolyDestroy(old_result);
+        Simplify(&final_result);
+        return final_result;
     }
+
     return result;
 }
 
@@ -241,7 +248,6 @@ poly_exp_t PolyDegBy(const Poly *p, size_t var_idx) {
         for (size_t i = 0; i < p->size; i++) {
             poly_exp_t current;
             if ((current = MonoGetExp(p->arr + i)) > max_down) {
-                printf("%i\n", current);
                 max_down = current;
             }
         }
