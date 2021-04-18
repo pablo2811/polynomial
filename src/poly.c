@@ -47,18 +47,25 @@ Poly PolyClone(const Poly *p) {
 }
 
 Poly addNumberToPoly(const Poly *p, poly_coeff_t x) {
-    Poly result = PolyClone(p);
-    result.arr = realloc(result.arr, (result.size + 1) * sizeof(Mono));
-    Poly q = PolyFromCoeff(x);
-    Mono m = MonoFromPoly(&q, 0);
-    result.arr[result.size] = m;
-    (result.size)++;
-    qsort(result.arr, result.size, sizeof(Mono), comparator_exponents);
-    return result;
+    Poly p_copy;
+    Mono m;
+    m.p = PolyFromCoeff(x);
+    m.exp = 0;
+    p_copy.arr = malloc(sizeof(Mono));
+    p_copy.size = 1;
+    p_copy.arr[0] = m;
+    return PolyAdd(p, &p_copy);
 }
 
 void Simplify(Poly *poly) {
     if (PolyIsCoeff(poly)) {
+        return;
+    }
+    if (poly->size == 1 && poly->arr[0].exp == 0 && PolyIsCoeff(&poly->arr[0].p)) {
+        poly_coeff_t coeff = poly->arr[0].p.coeff;
+        MonoDestroy(poly->arr);
+        poly->arr = NULL;
+        poly->coeff = coeff;
         return;
     }
     Mono *simplified = NULL;
@@ -77,7 +84,7 @@ void Simplify(Poly *poly) {
 
 
 Poly PolyAdd(const Poly *p, const Poly *q) {
-    Poly result;
+    Poly result = PolyFromCoeff(0);
     if (PolyIsCoeff(p) && PolyIsCoeff(q)) {
         result.arr = NULL;
         result.coeff = p->coeff + q->coeff;
@@ -87,32 +94,38 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
     } else if (!PolyIsCoeff(p) && PolyIsCoeff(q)) {
         result = addNumberToPoly(p, q->coeff);
     } else {
-        result.arr = NULL;
-        result.size = 0;
-        for (size_t i = 0; i < min(p->size, q->size); i++) {
-            if (MonoGetExp(p->arr + i) == MonoGetExp(q->arr + i)) {
-                Poly add_result = PolyAdd(&((p->arr + i)->p), &((q->arr + i)->p));
+        size_t i, j;
+        i = j = 0;
+        while (i < p->size && j < q->size) {
+            poly_exp_t exp_i = MonoGetExp(p->arr + i);
+            poly_exp_t exp_j = MonoGetExp(q->arr + j);
+            if (exp_i < exp_j) {
+                insertMonoToPoly(&result, MonoClone(p->arr + i));
+                i++;
+            } else if (exp_j < exp_i) {
+                insertMonoToPoly(&result, MonoClone(q->arr + j));
+                j++;
+            } else {
+                Poly add_result = PolyAdd(&((p->arr + i)->p), &((q->arr + j)->p));
                 if (!PolyIsZero(&add_result)) {
                     insertMonoToPoly(&result, MonoFromPoly(&add_result, MonoGetExp(p->arr + i)));
                 }
-            } else {
-                insertMonoToPoly(&result, MonoClone(p->arr + i));
-                insertMonoToPoly(&result, MonoClone(q->arr + i));
+                i++;
+                j++;
             }
         }
-        for (size_t j = min(p->size, q->size); j < max(p->size, q->size); j++) {
-            if (p->size > q->size) {
-                insertMonoToPoly(&result, MonoClone(p->arr + j));
-            } else {
-                insertMonoToPoly(&result, MonoClone(q->arr + j));
-            }
+        while (i < p->size) {
+            insertMonoToPoly(&result, MonoClone(p->arr + i));
+            i++;
         }
+        while (j < q->size) {
+            insertMonoToPoly(&result, MonoClone(q->arr + j));
+            j++;
+        }
+
     }
-    Poly *old_result = &result;
-    Poly final_result = PolyAddMonos(result.size, result.arr);
-    PolyDestroy(old_result);
-//    Simplify(&final_result);
-    return final_result;
+    Simplify(&result);
+    return result;
 }
 
 
@@ -144,14 +157,13 @@ Poly PolyAddMonos(size_t count, const Mono *monos) {
         }
         i = j;
     }
-//    MonoDestroy(monos_copy);
-    if (size_temp == 1 && temp->exp == 0 && PolyIsCoeff(&temp[0].p)) {
-        result.arr = NULL;
-        result.coeff = temp[0].p.coeff;
-        return result;
-    }
+//    for(size_t t = 0; t < count; t++){
+//        MonoDestroy(&monos_copy[t]);
+//    }
+
     result.arr = temp;
     result.size = size_temp;
+    Simplify(&result);
     return result;
 }
 
