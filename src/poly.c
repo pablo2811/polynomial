@@ -1,9 +1,9 @@
 #include "poly.h"
 #include <stdlib.h>
 
-void insertMonoToPoly(Mono **mono_arr, Mono *m, size_t *count) {
+void insertMonoToPoly(Mono **mono_arr, Mono m, size_t *count) {
     *mono_arr = realloc(*mono_arr, (*count + 1) * sizeof(Mono));
-    (*mono_arr)[*count] = *m;
+    (*mono_arr)[*count] = m;
     (*count)++;
 }
 
@@ -102,19 +102,19 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
             poly_exp_t exp_j = MonoGetExp(q->arr + j);
             if (exp_i < exp_j) {
                 Mono my_mono = MonoClone(p->arr + i);
-                insertMonoToPoly(&result.arr, &my_mono, &result.size);
+                insertMonoToPoly(&result.arr, my_mono, &result.size);
 //                insertMonoToPoly(&result, MonoClone(p->arr + i));
                 i++;
             } else if (exp_j < exp_i) {
                 Mono my_mono = MonoClone(q->arr + j);
-                insertMonoToPoly(&result.arr, &my_mono, &result.size);
+                insertMonoToPoly(&result.arr, my_mono, &result.size);
 //                insertMonoToPoly(&result, MonoClone(q->arr + j));
                 j++;
             } else {
                 Poly add_result = PolyAdd(&p->arr[i].p, &q->arr[j].p);
                 if (!PolyIsZero(&add_result)) {
                     Mono to_add = MonoFromPoly(&add_result, MonoGetExp(p->arr + i));
-                    insertMonoToPoly(&result.arr, &to_add, &result.size);
+                    insertMonoToPoly(&result.arr, to_add, &result.size);
 //                    MonoDestroy(&to_add);
                 }
 //                PolyDestroy(&add_result);
@@ -124,12 +124,12 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
         }
         while (i < p->size) {
             Mono my_mono = MonoClone(p->arr + i);
-            insertMonoToPoly(&result.arr, &my_mono, &result.size);
+            insertMonoToPoly(&result.arr, my_mono, &result.size);
             i++;
         }
         while (j < q->size) {
             Mono my_mono = MonoClone(q->arr + j);
-            insertMonoToPoly(&result.arr, &my_mono, &result.size);
+            insertMonoToPoly(&result.arr, my_mono, &result.size);
             j++;
         }
     }
@@ -141,15 +141,14 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
 
 
 Poly PolyAddMonos(size_t count, const Mono *monos) {
-    Poly result;
+    Poly result = PolyFromCoeff(0);
+    result.size = 0;
     Mono *monos_copy = malloc(count * sizeof(Mono));
     for (size_t i = 0; i < count; i++) {
         monos_copy[i] = MonoClone(&monos[i]);
     }
     qsort(monos_copy, count, sizeof(Mono), comparator_exponents);
     size_t i = 0;
-    Mono *temp = NULL;
-    size_t size_temp = 0;
     while (i < count) {
         Poly current_sum = monos_copy[i].p;
         size_t j = i + 1;
@@ -162,18 +161,16 @@ Poly PolyAddMonos(size_t count, const Mono *monos) {
         }
 //        Simplify(&current_sum);
         if (!PolyIsZero(&current_sum)) {
-            temp = realloc(temp, (size_temp + 1) * sizeof(Mono));
+//            result.arr = realloc(result.arr, (result.size + 1) * sizeof(Mono));
             Mono new_mono = MonoFromPoly(&current_sum, monos_copy[i].exp);
-            temp[size_temp] = MonoClone(&new_mono);
-            size_temp++;
+            insertMonoToPoly(&result.arr,new_mono,&result.size);
+//            result.arr[result.size] = MonoClone(&new_mono);
+//            result.size++;
         }
-        PolyDestroy(&current_sum);
+//        PolyDestroy(&current_sum);
         i = j;
     }
-   free(monos_copy);
-
-    result.arr = temp;
-    result.size = size_temp;
+    free(monos_copy);
     Simplify(&result);
     return result;
 }
