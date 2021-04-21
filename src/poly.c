@@ -166,8 +166,8 @@ Poly PolyAddMonos(size_t count, const Mono *monos) {
         }
         i = j;
     }
-    for(size_t k = 0; k < count; k++){
-        PolyDestroy(&monos_copy[k].p);
+    for(size_t k = 0; k < count; k++) {
+        MonoDestroy(&monos_copy[k]);
     }
     free(monos_copy);
     Simplify(&result);
@@ -230,7 +230,7 @@ Poly PolyMul(const Poly *p, const Poly *q) {
         }
         result = PolyAddMonos(amount_non_zero, tmp);
         for (size_t k = 0; k < amount_non_zero; k++) {
-            PolyDestroy(&tmp[k].p);
+            MonoDestroy(&tmp[k]);
         }
         free(tmp);
         Simplify(&result);
@@ -348,15 +348,15 @@ Poly PolyAt(const Poly *p, poly_coeff_t x) {
         result = PolyFromCoeff(p->coeff);
         return result;
     }
-    Poly current;
     for (size_t i = 0; i < p->size; i++) {
         poly_exp_t my_exponent = p->arr[i].exp;
         poly_coeff_t constant = notQuickPower(x, my_exponent);
         Poly multiplier = PolyFromCoeff(constant);
-        current = PolyMul(&multiplier, &p->arr[i].p);
-        Poly *ptr = &result;
-        result = PolyAdd(&result, &current);
+        Poly current = PolyMul(&multiplier, &p->arr[i].p);
+        Poly temp_result = PolyAdd(&result, &current);
         PolyDestroy(&current);
+        PolyDestroy(&result);
+        result = temp_result;
     }
     return result;
 }
