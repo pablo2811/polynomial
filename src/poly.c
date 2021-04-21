@@ -60,27 +60,31 @@ Poly addNumberToPoly(const Poly *p, poly_coeff_t x) {
 }
 
 void Simplify(Poly *poly) {
-    if (PolyIsCoeff(poly)) {
-        return;
-    }
-    if (poly->size == 1 && poly->arr[0].exp == 0 && PolyIsCoeff(&poly->arr[0].p)) {
-        poly_coeff_t coeff = poly->arr[0].p.coeff;
-        MonoDestroy(poly->arr);
-        poly->arr = NULL;
-        poly->coeff = coeff;
-        return;
-    }
-    Mono *simplified = NULL;
-    size_t simplified_size = 0;
+    if (PolyIsCoeff(poly)) return;
+
     for (size_t i = 0; i < poly->size; i++) {
-        if (!PolyIsZero(&poly->arr[i].p)) {
-            simplified = realloc(simplified, (simplified_size + 1) * sizeof(Mono));
-            simplified[simplified_size] = MonoClone(poly->arr + i);
-            simplified_size++;
+        Simplify(&poly->arr[i].p);
+    }
+    size_t swapper = poly->size - 1;
+    size_t i = 0;
+    while (i <= swapper) {
+        if (PolyIsZero(&poly->arr[i].p)) {
+            poly->arr[i] = poly->arr[swapper];
+            (poly->size)--;
+            if (swapper == 0) break;
+            swapper--;
+        } else {
+            i++;
         }
     }
-    poly->arr = simplified;
-    poly->size = simplified_size;
+    if (poly->size == 0) {
+        PolyDestroy(poly);
+        *poly = PolyZero();
+    } else if (poly->size == 1 && poly->arr[0].exp == 0 && PolyIsCoeff(&poly->arr[0].p)) {
+        Poly res = PolyFromCoeff(poly->arr[0].p.coeff);
+        PolyDestroy(poly);
+        *poly = res;
+    }
 }
 
 
@@ -135,7 +139,7 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
     }
     Mono *tmp = result.arr;
     Simplify(&result);
-    MonoDestroy(tmp);
+//    MonoDestroy(tmp);
     return result;
 }
 
@@ -163,7 +167,7 @@ Poly PolyAddMonos(size_t count, const Mono *monos) {
         if (!PolyIsZero(&current_sum)) {
 //            result.arr = realloc(result.arr, (result.size + 1) * sizeof(Mono));
             Mono new_mono = MonoFromPoly(&current_sum, monos_copy[i].exp);
-            insertMonoToPoly(&result.arr,new_mono,&result.size);
+            insertMonoToPoly(&result.arr, new_mono, &result.size);
 //            result.arr[result.size] = MonoClone(&new_mono);
 //            result.size++;
         }
