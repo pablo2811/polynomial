@@ -147,9 +147,9 @@ Poly PolyAddMonos(size_t count, const Mono *monos) {
         monos_copy[i] = MonoClone(&monos[i]);
     }
     qsort(monos_copy, count, sizeof(Mono), comparator_exponents);
-    size_t i = 0;
+    size_t i = 0, non_zero = 0;
     while (i < count) {
-        Poly current_sum = monos_copy[i].p;
+        Poly current_sum = PolyClone(&monos_copy[i].p);
         size_t j = i + 1;
         while (j < count && MonoGetExp(monos_copy + j) == MonoGetExp(monos_copy + i)) {
             Poly *ptr = &current_sum;
@@ -162,8 +162,12 @@ Poly PolyAddMonos(size_t count, const Mono *monos) {
         if (!PolyIsZero(&current_sum)) {
             Mono new_mono = MonoFromPoly(&current_sum, monos_copy[i].exp);
             insertMonoToPoly(&result, &new_mono);
+            non_zero++;
         }
         i = j;
+    }
+    for(size_t k = 0; k < count; k++){
+        PolyDestroy(&monos_copy[k].p);
     }
     free(monos_copy);
     Simplify(&result);
@@ -225,7 +229,7 @@ Poly PolyMul(const Poly *p, const Poly *q) {
             }
         }
         result = PolyAddMonos(amount_non_zero, tmp);
-        for(size_t k = 0; k < amount_non_zero; k++){
+        for (size_t k = 0; k < amount_non_zero; k++) {
             PolyDestroy(&tmp[k].p);
         }
         free(tmp);
