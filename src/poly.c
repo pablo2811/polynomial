@@ -1,6 +1,14 @@
 #include "poly.h"
 #include <stdlib.h>
 
+#define CHECK_PTR(p)  \
+  do {                \
+    if (p == NULL) {  \
+      exit(1);        \
+    }                 \
+  } while (0)
+
+
 void insertMonoToPoly(Poly *poly, Mono *m) {
     poly->arr = realloc(poly->arr, (poly->size + 1) * sizeof(Mono));
     (poly->arr)[poly->size] = *m;
@@ -38,6 +46,7 @@ Poly PolyClone(const Poly *p) {
         result.arr = NULL;
     } else {
         result.arr = malloc(sizeof(Mono) * (p->size));
+        CHECK_PTR(result.arr);
         for (size_t i = 0; i < p->size; i++) {
             result.arr[i] = MonoClone(p->arr + i);
         }
@@ -52,6 +61,7 @@ Poly addNumberToPoly(const Poly *p, poly_coeff_t x) {
     m.p = PolyFromCoeff(x);
     m.exp = 0;
     p_copy.arr = malloc(sizeof(Mono));
+    CHECK_PTR(p_copy.arr);
     p_copy.size = 1;
     p_copy.arr[0] = m;
     Poly result = PolyAdd(p, &p_copy);
@@ -144,6 +154,7 @@ Poly PolyAddMonos(size_t count, const Mono *monos) {
     Poly result = PolyZero();
     result.size = 0;
     Mono *monos_copy = malloc(count * sizeof(Mono));
+    CHECK_PTR(monos_copy);
     for (size_t i = 0; i < count; i++) {
         monos_copy[i] = monos[i];
     }
@@ -176,6 +187,7 @@ Poly PolyAddMonos(size_t count, const Mono *monos) {
 Poly PolyCoefMul(poly_coeff_t m, const Poly *q) {
     Poly result;
     result.arr = malloc((q->size) * sizeof(Mono));
+    CHECK_PTR(result.arr);
     for (size_t i = 0; i < q->size; i++) {
         Poly number = PolyFromCoeff(m);
         result.arr[i].p = PolyMul(&(q->arr->p), &number);
@@ -190,6 +202,7 @@ Poly PolyCoeffMul(const Poly *p, const Poly *q) {
     Poly result;
     if (PolyIsZero(q)) return PolyZero();
     Mono *tmp = malloc((p->size) * sizeof(Mono));
+    CHECK_PTR(tmp);
     size_t amount_non_zero = 0;
     for (size_t j = 0; j < p->size; j++) {
         Poly mul_result = PolyMul(&p->arr[j].p, q);
@@ -216,6 +229,7 @@ Poly PolyMul(const Poly *p, const Poly *q) {
         return PolyCoeffMul(p, q);
     } else {
         Mono *tmp = malloc((p->size) * (q->size) * sizeof(Mono));
+        CHECK_PTR(tmp);
         size_t amount_non_zero = 0;
         for (size_t i = 0; i < p->size; i++) {
             for (size_t j = 0; j < q->size; j++) {
@@ -244,6 +258,7 @@ Poly PolyNeg(const Poly *p) {
         result.arr = NULL;
     } else {
         result.arr = malloc(sizeof(Mono) * (p->size));
+        CHECK_PTR(result.arr);
         result.size = p->size;
         for (size_t i = 0; i < p->size; i++) {
             result.arr[i].p = PolyNeg(&p->arr[i].p);
