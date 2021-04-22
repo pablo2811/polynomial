@@ -1,5 +1,5 @@
 /** @file
-  Implementacja klasy wielomianów rzadkich wielu zmiennych
+  Implementacja klasy wielomianów rzadkich wielu zmiennych.
 
   @authors Paweł Fijałkowski <pf429189@students.mimuw.edu.pl>
   @copyright Uniwersytet Warszawski
@@ -22,7 +22,7 @@
  * @param[in] poly : wielomian
  * @param[in] m : jednomian
  */
-void insertMonoToPoly(Poly *poly, Mono *m) {
+static void insertMonoToPoly(Poly *poly, Mono *m) {
     poly->arr = realloc(poly->arr, (poly->size + 1) * sizeof(Mono));
     CHECK_PTR(poly->arr);
     (poly->arr)[poly->size] = *m;
@@ -44,7 +44,7 @@ void PolyDestroy(Poly *p) {
  * @param[in] p2 : wskaźnik rzutowalny na jednomianowy.
  * @return Różnica wartości wykładników jednomianów.
  */
-poly_exp_t comparator_exponents(const void *p1, const void *p2) {
+static poly_exp_t comparator_exponents(const void *p1, const void *p2) {
     Mono *mono1 = (Mono *) p1;
     Mono *mono2 = (Mono *) p2;
     return mono1->exp - mono2->exp;
@@ -91,7 +91,7 @@ Poly addNumberToPoly(const Poly *p, poly_coeff_t x) {
  * Usuwa zerowe jednomiany z wielomianu.
  * @param[in] poly : Wielomian do uproszczenia.
  */
-void Simplify(Poly *poly) {
+static void Simplify(Poly *poly) {
     if (PolyIsCoeff(poly)) return;
 
     for (size_t i = 0; i < poly->size; i++) {
@@ -213,7 +213,7 @@ Poly PolyAddMonos(size_t count, const Mono *monos) {
  * @param[in] q : Wielomian stały (liczba).
  * @return Wielomian będący wynikiem mnożenia.
  */
-Poly PolyCoeffMul(const Poly *p, const Poly *q) {
+static Poly PolyCoeffMul(const Poly *p, const Poly *q) {
     Poly result;
     if (q->coeff == 0) return PolyZero();
     Mono *tmp = malloc((p->size) * sizeof(Mono));
@@ -325,7 +325,7 @@ poly_exp_t PolyDegBy(const Poly *p, size_t var_idx) {
  * @param[in] m : Jednomian którego stopień należy wyznaczyć.
  * @return Stopień jednomianu.
  */
-poly_exp_t MonoDeg(Mono *m) {
+static poly_exp_t MonoDeg(Mono *m) {
     if (PolyIsCoeff(&(m->p))) {
         return MonoGetExp(m);
     }
@@ -375,7 +375,7 @@ bool PolyIsEq(const Poly *p, const Poly *q) {
  * @param[in] exp : Wykładnik operacji potęgowania.
  * @return Wynik potęgowania.
  */
-poly_coeff_t power(poly_coeff_t x, poly_exp_t exp) {
+static poly_coeff_t power(poly_coeff_t x, poly_exp_t exp) {
     poly_coeff_t result = 1;
     for (poly_exp_t i = 0; i < exp; i++) {
         result *= x;
