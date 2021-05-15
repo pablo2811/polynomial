@@ -15,7 +15,7 @@ Poly popStack(Stack *s, bool *err) {
         return PolyZero();
     }
     (s->amount)--;
-    if (2 * s->amount < s->capacity) {
+    if (2 * s->amount < s->capacity && s->capacity >= 2) {
         s->stack = realloc(s->stack, s->capacity / 2);
         s->capacity /= 2;
         CHECK_PTR(s->stack);

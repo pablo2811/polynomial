@@ -4,11 +4,13 @@
 
 void PolyGetHelper(Stack *s, Poly *componentA, Poly *componentB, bool *err) {
     *componentA = popStack(s, err);
+    if (*err) return;
     *componentB = popStack(s, err);
+    if (*err) pushStack(s, componentA);
 }
 
 
-bool zero(Stack *s) {
+void zero(Stack *s) {
     Poly newPoly = PolyZero();
     pushStack(s, &newPoly);
 }
