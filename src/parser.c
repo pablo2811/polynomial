@@ -38,9 +38,7 @@ Poly parsePoly(char **line, bool *err) {
     bool isCoeff;
     long long coeff = getCoeff(line, &isCoeff);
     if (isCoeff) return PolyFromCoeff(coeff);
-    Poly result;
-    result.arr = NULL;
-    result.size = 0;
+    Poly result = PolyZero();
     while (**line != ',' && **line != '\n') {
         Mono current;
         switch (**line) {
