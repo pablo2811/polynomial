@@ -30,6 +30,7 @@ long getExponent(char **line, bool *isExponent) {
         *isExponent = true;
         return argument;
     }
+    return 0;
 }
 
 
@@ -58,15 +59,13 @@ Poly parsePoly(char **line, bool *err) {
 }
 
 Mono parseMono(char **line, bool *err) {
-    Poly coeff;
-    long exp;
     bool isExp;
     if (**line == '(') {
         (*line)++;
-        coeff = parsePoly(line, err);
+        Poly coeff = parsePoly(line, err);
         if (**line != ',') *err = true;
         (*line)++;
-        exp = getExponent(line, &isExp);
+        long exp = getExponent(line, &isExp);
         if (**line != ')' || !isExp) *err = true;
         (*line)++;
         return MonoFromPoly(&coeff, (int) exp);
@@ -79,7 +78,7 @@ Mono parseMono(char **line, bool *err) {
 
 void runCommand(Stack *s, char *line, int lineNumber) {
     char *space = strchr(line, ' ');
-    bool err;
+    bool err = false;
     if (space == NULL) {
         if (strcmp(line, "ZERO\n") == 0) {
             zero(s);
