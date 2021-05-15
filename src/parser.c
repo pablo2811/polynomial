@@ -1,25 +1,83 @@
-#include "parser.h"
-#include "stack.h"
-#include "command_handler.h"
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
 
-Poly parsePoly(char *line, int length, bool *err) {
-    // todo
+#include "parser.h"
+#include "command_handler.h"
+
+long getCoeff(char **line, bool *isCoeff) {
+    char *endptr;
+    long long argument = strtol(*line, &endptr, 10);
+    if (endptr == *line || ((argument == LONG_MAX || argument == LONG_MIN) && errno == ERANGE)) {
+        *isCoeff = false;
+    } else {
+        *isCoeff = true;
+        *line = endptr;
+        return argument;
+    }
+    return 0;
+}
+
+long getExponent(char **line, bool *isExponent) {
+    char *endptr;
+    long argument = strtol(*line, &endptr, 10);
+    if (endptr == *line || (argument == LONG_MAX && errno == ERANGE)) {
+        *isExponent = false;
+    } else {
+        *line = endptr;
+        *isExponent = true;
+        return argument;
+    }
+}
+
+
+Poly parsePoly(char **line, bool *err) {
+    bool isCoeff;
+    long long coeff = getCoeff(line, &isCoeff);
+    if (isCoeff) return PolyFromCoeff(coeff);
     Poly result;
+    result.arr = NULL;
+    result.size = 0;
+    while (**line != ',' && **line != '\n') {
+        Mono current;
+        switch (**line) {
+            case '(':
+                current = parseMono(line, err);
+                insertMonoToPoly(&result, &current);
+                break;
+            case '+':
+                (*line)++;
+                break;
+            default:
+                *err = true;
+        }
+    }
     return result;
 }
 
-Mono parseMono(char *line, int length, bool *err) {
-    // todo
-    Mono result;
-    return result;
+Mono parseMono(char **line, bool *err) {
+    Poly coeff;
+    long exp;
+    bool isExp;
+    if (**line == '(') {
+        (*line)++;
+        coeff = parsePoly(line, err);
+        if (**line != ',') *err = true;
+        (*line)++;
+        exp = getExponent(line, &isExp);
+        if (**line != ')' || !isExp) *err = true;
+        (*line)++;
+        return MonoFromPoly(&coeff, (int) exp);
+    } else {
+        *err = true;
+        Poly fooPoly = PolyZero();
+        return MonoFromPoly(&fooPoly, 1);
+    }
 }
 
-void runCommand(Stack *s, char *line, int length, int lineNumber) {
+void runCommand(Stack *s, char *line, int lineNumber) {
     char *space = strchr(line, ' ');
     bool err;
     if (space == NULL) {

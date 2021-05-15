@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <stddef.h>
 #include "parser.h"
-#include "poly.h"
-#include "stack.h"
 
 #define COMMENT_SIGN '#'
 
@@ -16,11 +14,11 @@ void run() {
     Stack myStack = getEmptyStack();
     while ((characters = getline(&buffer, &bufsize, stdin)) != -1) {
         bool err = false;
-        if (characters == 0 || (characters > 0 && *buffer == COMMENT_SIGN)) continue;
+        if (characters <= 1 || (characters > 0 && *buffer == COMMENT_SIGN)) continue;
         if ((90 >= *buffer && *buffer >= 65) || (122 >= *buffer && *buffer >= 97)) {
             runCommand(&myStack, buffer, (int) characters);
         } else {
-            Poly parsed = parsePoly(buffer, (int) characters, &err);
+            Poly parsed = parsePoly(&buffer, &err);
             if (err) {
                 printf("ERROR %d WRONG POLY\n", lineNumber);
             } else {

@@ -17,6 +17,7 @@ Poly popStack(Stack *s, bool *err) {
     (s->amount)--;
     if (2 * s->amount < s->capacity) {
         s->stack = realloc(s->stack, s->capacity / 2);
+        s->capacity /= 2;
         CHECK_PTR(s->stack);
     }
     return s->stack[s->amount];
@@ -34,6 +35,7 @@ Poly topStack(Stack *s, bool *err) {
 void pushStack(Stack *s, const Poly *p) {
     if (s->amount == s->capacity) {
         s->stack = realloc(s->stack, sizeof(Poly) * (2 * s->capacity));
+        s->capacity *= 2;
         CHECK_PTR(s->stack);
     }
     s->stack[s->amount] = *p;

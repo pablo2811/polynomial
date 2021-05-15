@@ -87,7 +87,9 @@ void deg(Stack *s, bool *err) {
 }
 
 void print(Stack *s, bool *err) {
-    // what?
+    Poly top = topStack(s, err);
+    if (*err) return;
+    PolyPrint(&top);
 }
 
 void pop(Stack *s, bool *err) {

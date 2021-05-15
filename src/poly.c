@@ -8,21 +8,46 @@
 
 #include "poly.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 #define CHECK_PTR(p) \
     do {         \
         if (p == NULL) { \
             exit(1); \
         } \
-    } while (0) \
+    } while (0)      \
 
+
+
+void MonoPrint(const Mono *mono) {
+    printf("(");
+    PolyPrintUtil(&(mono->p));
+    printf(",%d)", mono->exp);
+
+}
+
+void PolyPrintUtil(const Poly *poly) {
+    if (PolyIsCoeff(poly)) {
+        printf("%ld", poly->coeff);
+        return;
+    }
+    for (size_t i = 0; i < poly->size; i++) {
+        MonoPrint(poly->arr + i);
+        if (i < poly->size - 1) printf("+");
+    }
+}
+
+void PolyPrint(const Poly *p) {
+    PolyPrintUtil(p);
+    printf("\n");
+}
 
 /**
  * Dodaje nowy jednomian do wielomianu.
  * @param[in] poly : wielomian
  * @param[in] m : jednomian
  */
-static void insertMonoToPoly(Poly *poly, Mono *m) {
+void insertMonoToPoly(Poly *poly, Mono *m) {
     poly->arr = realloc(poly->arr, (poly->size + 1) * sizeof(Mono));
     CHECK_PTR(poly->arr);
     (poly->arr)[poly->size] = *m;
@@ -44,7 +69,7 @@ void PolyDestroy(Poly *p) {
  * @param[in] p2 : wskaźnik rzutowalny na jednomianowy.
  * @return Różnica wartości wykładników jednomianów.
  */
-static poly_exp_t comparator_exponents(const void *p1, const void *p2) {
+static poly_exp_t comparatorExponents(const void *p1, const void *p2) {
     Mono *mono1 = (Mono *) p1;
     Mono *mono2 = (Mono *) p2;
     return mono1->exp - mono2->exp;
@@ -117,7 +142,7 @@ static void Simplify(Poly *poly) {
         PolyDestroy(poly);
         *poly = res;
     } else {
-        qsort(poly->arr, poly->size, sizeof(Mono), comparator_exponents);
+        qsort(poly->arr, poly->size, sizeof(Mono), comparatorExponents);
     }
 }
 
@@ -181,7 +206,7 @@ Poly PolyAddMonos(size_t count, const Mono *monos) {
     for (size_t i = 0; i < count; i++) {
         monos_copy[i] = monos[i];
     }
-    qsort(monos_copy, count, sizeof(Mono), comparator_exponents);
+    qsort(monos_copy, count, sizeof(Mono), comparatorExponents);
     size_t i = 0;
     while (i < count) {
         Poly current_sum = PolyClone(&monos_copy[i].p);
