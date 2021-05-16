@@ -15,7 +15,7 @@ void StackKill(Stack *myStack) {
     free(myStack);
 }
 
-void run() {
+void Run() {
     char *buffer = NULL;
     size_t bufsize = 0;
     ssize_t characters;
@@ -25,7 +25,9 @@ void run() {
         bool err = false;
         char *ptr = buffer;
         lineNumber++;
-        if (characters <= 1 || (characters > 0 && *buffer == COMMENT_SIGN)) continue;
+        if (characters <= 1 || (characters > 0 && *buffer == COMMENT_SIGN)) {
+            continue;
+        }
         if (isalpha(*buffer)) {
             RunCommand(&myStack, buffer, lineNumber);
         } else {
@@ -45,7 +47,7 @@ void run() {
 
 
 int main() {
-    run();
+    Run();
     return 0;
 }
 

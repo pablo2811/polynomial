@@ -33,7 +33,9 @@ void PolyPrintUtil(const Poly *poly) {
     }
     for (size_t i = 0; i < poly->size; i++) {
         MonoPrint(poly->arr + i);
-        if (i < poly->size - 1) printf("+");
+        if (i < poly->size - 1) {
+            printf("+");
+        }
     }
 }
 
@@ -81,7 +83,9 @@ Poly PolyClone(const Poly *p) {
         result.coeff = p->coeff;
         result.arr = NULL;
     } else {
-        if (p->size == 0) return PolyFromCoeff(p->coeff);
+        if (p->size == 0) {
+            return PolyFromCoeff(p->coeff);
+        }
         result.arr = malloc(sizeof(Mono) * (p->size));
         CHECK_PTR(result.arr);
         for (size_t i = 0; i < p->size; i++) {
@@ -128,7 +132,9 @@ static void Simplify(Poly *poly) {
         if (PolyIsZero(&poly->arr[i].p)) {
             poly->arr[i] = poly->arr[swapper];
             (poly->size)--;
-            if (swapper == 0) break;
+            if (swapper == 0) {
+                break;
+            }
             swapper--;
         } else {
             i++;
@@ -198,7 +204,9 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
 
 
 Poly PolyAddMonos(size_t count, const Mono *monos) {
-    if (count == 0) return PolyZero();
+    if (count == 0) {
+        return PolyZero();
+    }
     Poly result = PolyZero();
     result.size = 0;
     Mono *monos_copy = malloc(count * sizeof(Mono));
@@ -240,7 +248,9 @@ Poly PolyAddMonos(size_t count, const Mono *monos) {
  */
 static Poly PolyCoeffMul(const Poly *p, const Poly *q) {
     Poly result;
-    if (q->coeff == 0) return PolyZero();
+    if (q->coeff == 0) {
+        return PolyZero();
+    }
     Mono *tmp = malloc((p->size) * sizeof(Mono));
     CHECK_PTR(tmp);
     size_t amount_non_zero = 0;
@@ -300,7 +310,9 @@ Poly PolyNeg(const Poly *p) {
         result.coeff = -p->coeff;
         result.arr = NULL;
     } else {
-        if (p->size == 0) return PolyFromCoeff(-p->coeff);
+        if (p->size == 0) {
+            return PolyFromCoeff(-p->coeff);
+        }
         result.arr = malloc(sizeof(Mono) * (p->size));
         CHECK_PTR(result.arr);
         result.size = p->size;

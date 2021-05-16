@@ -63,7 +63,9 @@ void SimpleCheck(const char *line, bool *err) {
     char *copyBeg = copy;
     strcpy(copy, line);
     GetCoeff(&copy, &isCoeff);
-    if ((isCoeff && *copy != '\n') || (!isCoeff && *copy != '(')) *err = true;
+    if ((isCoeff && *copy != '\n') || (!isCoeff && *copy != '(')) {
+        *err = true;
+    }
     free(copyBeg);
 }
 
@@ -92,7 +94,9 @@ void AdvancedCheck(const char *line, bool *err) {
 Poly ParsePoly(char **line, bool *err) {
     SimpleCheck(*line, err);
     AdvancedCheck(*line, err);
-    if (*err) return PolyZero();
+    if (*err) {
+        return PolyZero();
+    }
     return ParsePolyUtil(line, err);
 }
 
@@ -100,16 +104,21 @@ Poly ParsePoly(char **line, bool *err) {
 Poly ParsePolyUtil(char **line, bool *err) {
     bool isCoeff;
     long long coeff = GetCoeff(line, &isCoeff);
-    if (isCoeff) return PolyFromCoeff(coeff);
+    if (isCoeff) {
+        return PolyFromCoeff(coeff);
+    }
     Poly temp = PolyZero();
     while (**line != ',' && **line != '\n' && !*err) {
         Mono current;
         if (**line == '(') {
             current = ParseMono(line, err);
             InsertMonoToPoly(&temp, &current);
-            if (**line != ',' && **line != '+' && **line != '\n') *err = true;
-            if (**line == '+' && *(*line + 1) == '\n') *err = true;
-            if (**line != '\n' && **line != ',') (*line)++;
+            if ((**line != ',' && **line != '+' && **line != '\n') || (**line == '+' && *(*line + 1) == '\n')) {
+                *err = true;
+            }
+            if (**line != '\n' && **line != ',') {
+                (*line)++;
+            }
         } else {
             *err = true;
         }
@@ -124,10 +133,14 @@ Mono ParseMono(char **line, bool *err) {
     if (**line == '(') {
         (*line)++;
         Poly coeff = ParsePolyUtil(line, err);
-        if (**line != ',') *err = true;
+        if (**line != ',') {
+            *err = true;
+        }
         (*line)++;
         int exp = GetExponent(line, &isExp);
-        if (**line != ')' || !isExp) *err = true;
+        if (**line != ')' || !isExp) {
+            *err = true;
+        }
         (*line)++;
         return (Mono) {.p = coeff, .exp = exp};
     } else {
@@ -186,5 +199,7 @@ void RunCommand(Stack *s, char *line, int lineNumber) {
     } else {
         fprintf(stderr, "ERROR %d WRONG COMMAND\n", lineNumber);
     }
-    if (err) fprintf(stderr, "ERROR %d STACK UNDERFLOW\n", lineNumber);
+    if (err) {
+        fprintf(stderr, "ERROR %d STACK UNDERFLOW\n", lineNumber);
+    }
 }
