@@ -37,6 +37,7 @@ void Run() {
             Poly parsed = ParsePoly(&buffer, &err);
             if (err) {
                 fprintf(stderr, "ERROR %d WRONG POLY\n", lineNumber);
+                PolyDestroy(&parsed);
             } else {
                 PushStack(&myStack, &parsed);
             }
@@ -46,7 +47,8 @@ void Run() {
     }
 
     free(buffer);
-    StackKill(&myStack);
+
+//    StackKill(&myStack);
 }
 
 
