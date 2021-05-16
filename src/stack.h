@@ -11,11 +11,11 @@ typedef struct Stack {
     int amount;
 } Stack;
 
-Poly popStack(Stack *s, bool *err);
+Poly PopStack(Stack *s, bool *err);
 
-Poly topStack(Stack *s, bool *err);
+Poly TopStack(Stack *s, bool *err);
 
-void pushStack(Stack *s, const Poly *p);
+void PushStack(Stack *s, const Poly *p);
 
-Stack getEmptyStack();
+Stack GetEmptyStack();
 

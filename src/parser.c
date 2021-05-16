@@ -8,7 +8,7 @@
 #include "parser.h"
 #include "command_handler.h"
 
-long getCoeff(char **line, bool *isCoeff) {
+long GetCoeff(char **line, bool *isCoeff) {
     if (**line == '+') {
         *isCoeff = false;
         return 0;
@@ -25,7 +25,7 @@ long getCoeff(char **line, bool *isCoeff) {
     return 0;
 }
 
-int getExponent(char **line, bool *isExponent) {
+int GetExponent(char **line, bool *isExponent) {
     if (**line == '+') {
         *isExponent = false;
         return 0;
@@ -42,7 +42,7 @@ int getExponent(char **line, bool *isExponent) {
     return 0;
 }
 
-bool eachSignNumerical(const char *string) {
+bool EachSignNumerical(const char *string) {
     while (*string != '\0' && *string != '\n') {
         if (*string - '0' > 10 || *string - '0' < 0) {
             return false;
@@ -52,22 +52,22 @@ bool eachSignNumerical(const char *string) {
     return true;
 }
 
-bool startsWith(const char *str, const char *pre) {
+bool StartsWith(const char *str, const char *pre) {
     size_t lenpre = strlen(pre), lenstr = strlen(str);
     return lenstr < lenpre ? false : memcmp(pre, str, lenpre) == 0;
 }
 
-void simpleCheck(const char *line, bool *err) {
+void SimpleCheck(const char *line, bool *err) {
     bool isCoeff;
     char *copy = malloc((strlen(line) + 1) * (sizeof(char)));
     char *copyBeg = copy;
     strcpy(copy, line);
-    getCoeff(&copy, &isCoeff);
+    GetCoeff(&copy, &isCoeff);
     if ((isCoeff && *copy != '\n') || (!isCoeff && *copy != '(')) *err = true;
     free(copyBeg);
 }
 
-void advancedCheck(const char *line, bool *err) {
+void AdvancedCheck(const char *line, bool *err) {
     char *goodChars = "(),+-";
     int openBrackets, closedBrackets;
     openBrackets = closedBrackets = 0;
@@ -89,24 +89,24 @@ void advancedCheck(const char *line, bool *err) {
     }
 }
 
-Poly parsePoly(char **line, bool *err) {
-    simpleCheck(*line, err);
-    advancedCheck(*line, err);
+Poly ParsePoly(char **line, bool *err) {
+    SimpleCheck(*line, err);
+    AdvancedCheck(*line, err);
     if (*err) return PolyZero();
-    return parsePolyUtil(line, err);
+    return ParsePolyUtil(line, err);
 }
 
 
-Poly parsePolyUtil(char **line, bool *err) {
+Poly ParsePolyUtil(char **line, bool *err) {
     bool isCoeff;
-    long long coeff = getCoeff(line, &isCoeff);
+    long long coeff = GetCoeff(line, &isCoeff);
     if (isCoeff) return PolyFromCoeff(coeff);
     Poly temp = PolyZero();
     while (**line != ',' && **line != '\n' && !*err) {
         Mono current;
         if (**line == '(') {
-            current = parseMono(line, err);
-            insertMonoToPoly(&temp, &current);
+            current = ParseMono(line, err);
+            InsertMonoToPoly(&temp, &current);
             if (**line != ',' && **line != '+' && **line != '\n') *err = true;
             if (**line == '+' && *(*line + 1) == '\n') *err = true;
             if (**line != '\n' && **line != ',') (*line)++;
@@ -119,14 +119,14 @@ Poly parsePolyUtil(char **line, bool *err) {
     return result;
 }
 
-Mono parseMono(char **line, bool *err) {
+Mono ParseMono(char **line, bool *err) {
     bool isExp;
     if (**line == '(') {
         (*line)++;
-        Poly coeff = parsePolyUtil(line, err);
+        Poly coeff = ParsePolyUtil(line, err);
         if (**line != ',') *err = true;
         (*line)++;
-        int exp = getExponent(line, &isExp);
+        int exp = GetExponent(line, &isExp);
         if (**line != ')' || !isExp) *err = true;
         (*line)++;
         return (Mono) {.p = coeff, .exp = exp};
@@ -137,24 +137,24 @@ Mono parseMono(char **line, bool *err) {
     }
 }
 
-void runCommand(Stack *s, char *line, int lineNumber) {
+void RunCommand(Stack *s, char *line, int lineNumber) {
     bool err = false;
     char *endptr, *argumentString;
-    if (startsWith(line, "AT")) {
+    if (StartsWith(line, "AT")) {
         argumentString = line + 2;
         long long argument = strtoll(argumentString, &endptr, 10);
         if (*argumentString != ' ' || endptr == argumentString ||
             ((argument == LLONG_MAX || argument == LLONG_MIN) && errno == ERANGE) ||
-            !eachSignNumerical(argumentString + 1)) {
+            !EachSignNumerical(argumentString + 1)) {
             fprintf(stderr, "ERROR %d AT WRONG VALUE\n", lineNumber);
         } else {
             at(s, argument, &err);
         }
-    } else if (startsWith(line, "DEG_BY")) {
+    } else if (StartsWith(line, "DEG_BY")) {
         argumentString = line + 7;
         long argument = strtol(argumentString, &endptr, 10);
         if (endptr == argumentString || (argument == LONG_MAX && errno == ERANGE) ||
-            !eachSignNumerical(argumentString)) {
+            !EachSignNumerical(argumentString)) {
             fprintf(stderr, "ERROR %d DEG BY WRONG VARIABLE\n", lineNumber);
         } else {
             degBy(s, argument, &err);

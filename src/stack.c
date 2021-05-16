@@ -9,7 +9,7 @@
     } while (0) \
 
 
-Poly popStack(Stack *s, bool *err) {
+Poly PopStack(Stack *s, bool *err) {
     if (s->amount == 0) {
         *err = true;
         return PolyZero();
@@ -19,7 +19,7 @@ Poly popStack(Stack *s, bool *err) {
 
 }
 
-Poly topStack(Stack *s, bool *err) {
+Poly TopStack(Stack *s, bool *err) {
     if (s->amount == 0) {
         *err = true;
         return PolyZero();
@@ -27,7 +27,7 @@ Poly topStack(Stack *s, bool *err) {
     return s->stack[s->amount - 1];
 }
 
-void pushStack(Stack *s, const Poly *p) {
+void PushStack(Stack *s, const Poly *p) {
     if (s->amount == s->capacity) {
         s->stack = realloc(s->stack, sizeof(Poly) * (2 * s->capacity));
         s->capacity *= 2;
@@ -37,7 +37,7 @@ void pushStack(Stack *s, const Poly *p) {
     (s->amount)++;
 }
 
-Stack getEmptyStack() {
+Stack GetEmptyStack() {
     Stack s;
     s.stack = malloc(sizeof(Poly));
     CHECK_PTR(s.stack);

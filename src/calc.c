@@ -8,7 +8,7 @@
 
 #define COMMENT_SIGN '#'
 
-void stackKill(Stack *myStack) {
+void StackKill(Stack *myStack) {
     for (int i = 0; i < myStack->amount; i++) {
         PolyDestroy(myStack->stack + i);
     }
@@ -20,27 +20,27 @@ void run() {
     size_t bufsize = 0;
     ssize_t characters;
     int lineNumber = 0;
-    Stack myStack = getEmptyStack();
+    Stack myStack = GetEmptyStack();
     while ((characters = getline(&buffer, &bufsize, stdin)) != -1) {
         bool err = false;
         char *ptr = buffer;
         lineNumber++;
         if (characters <= 1 || (characters > 0 && *buffer == COMMENT_SIGN)) continue;
         if (isalpha(*buffer)) {
-            runCommand(&myStack, buffer, lineNumber);
+            RunCommand(&myStack, buffer, lineNumber);
         } else {
-            Poly parsed = parsePoly(&buffer, &err);
+            Poly parsed = ParsePoly(&buffer, &err);
             if (err) {
                 fprintf(stderr, "ERROR %d WRONG POLY\n", lineNumber);
             } else {
-                pushStack(&myStack, &parsed);
+                PushStack(&myStack, &parsed);
             }
         }
         free(ptr);
         buffer = NULL;
     }
     free(buffer);
-    stackKill(&myStack);
+    StackKill(&myStack);
 }
 
 

@@ -3,36 +3,36 @@
 #include "stack.h"
 
 void PolyGetHelper(Stack *s, Poly *componentA, Poly *componentB, bool *err) {
-    *componentA = popStack(s, err);
+    *componentA = PopStack(s, err);
     if (*err) return;
-    *componentB = popStack(s, err);
-    if (*err) pushStack(s, componentA);
+    *componentB = PopStack(s, err);
+    if (*err) PushStack(s, componentA);
 }
 
 
 void zero(Stack *s) {
     Poly newPoly = PolyZero();
-    pushStack(s, &newPoly);
+    PushStack(s, &newPoly);
 }
 
 
 void isCoeff(Stack *s, bool *err) {
-    Poly top = topStack(s, err);
+    Poly top = TopStack(s, err);
     if (*err) return;
     printf("%d\n", PolyIsCoeff(&top));
 }
 
 void isZero(Stack *s, bool *err) {
-    Poly top = topStack(s, err);
+    Poly top = TopStack(s, err);
     if (*err) return;
     printf("%d\n", PolyIsZero(&top));
 }
 
 void clone(Stack *s, bool *err) {
-    Poly top = topStack(s, err);
+    Poly top = TopStack(s, err);
     if (*err) return;
     Poly topClone = PolyClone(&top);
-    pushStack(s, &topClone);
+    PushStack(s, &topClone);
 }
 
 void add(Stack *s, bool *err) {
@@ -42,7 +42,7 @@ void add(Stack *s, bool *err) {
     sum = PolyAdd(&componentA, &componentB);
     PolyDestroy(&componentA);
     PolyDestroy(&componentB);
-    pushStack(s, &sum);
+    PushStack(s, &sum);
 }
 
 void mul(Stack *s, bool *err) {
@@ -52,15 +52,15 @@ void mul(Stack *s, bool *err) {
     mulResult = PolyMul(&componentA, &componentB);
     PolyDestroy(&componentA);
     PolyDestroy(&componentB);
-    pushStack(s, &mulResult);
+    PushStack(s, &mulResult);
 }
 
 void neg(Stack *s, bool *err) {
-    Poly toNeg = popStack(s, err);
+    Poly toNeg = PopStack(s, err);
     if (*err) return;
     Poly afterNeg = PolyNeg(&toNeg);
     PolyDestroy(&toNeg);
-    pushStack(s, &afterNeg);
+    PushStack(s, &afterNeg);
 }
 
 void sub(Stack *s, bool *err) {
@@ -70,7 +70,7 @@ void sub(Stack *s, bool *err) {
     subResult = PolySub(&componentA, &componentB);
     PolyDestroy(&componentA);
     PolyDestroy(&componentB);
-    pushStack(s, &subResult);
+    PushStack(s, &subResult);
 }
 
 void isEq(Stack *s, bool *err) {
@@ -78,38 +78,38 @@ void isEq(Stack *s, bool *err) {
     PolyGetHelper(s, &componentA, &componentB, err);
     if (*err) return;
     printf("%d\n", PolyIsEq(&componentA, &componentB));
-    pushStack(s, &componentB);
-    pushStack(s, &componentA);
+    PushStack(s, &componentB);
+    PushStack(s, &componentA);
 }
 
 void deg(Stack *s, bool *err) {
-    Poly top = topStack(s, err);
+    Poly top = TopStack(s, err);
     if (*err) return;
     printf("%d\n", PolyDeg(&top));
 }
 
 void print(Stack *s, bool *err) {
-    Poly top = topStack(s, err);
+    Poly top = TopStack(s, err);
     if (*err) return;
     PolyPrint(&top);
 }
 
 void pop(Stack *s, bool *err) {
-    popStack(s, err);
+    PopStack(s, err);
 }
 
 void degBy(Stack *s, unsigned long long x, bool *err) {
-    Poly top = topStack(s, err);
+    Poly top = TopStack(s, err);
     if (*err) return;
     printf("%d\n", PolyDegBy(&top, x));
 }
 
 void at(Stack *s, long long x, bool *err) {
-    Poly pop = popStack(s, err);
+    Poly pop = PopStack(s, err);
     if (*err) return;
     Poly atPoly = PolyAt(&pop, x);
     PolyDestroy(&pop);
-    pushStack(s, &atPoly);
+    PushStack(s, &atPoly);
 }
 
 

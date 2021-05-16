@@ -226,6 +226,6 @@ void PolyPrintUtil(const Poly *poly);
 
 void PolyPrint(const Poly *p);
 
-void insertMonoToPoly(Poly *poly, Mono *m);
+void InsertMonoToPoly(Poly *poly, Mono *m);
 
 #endif /* __POLY_H__ */

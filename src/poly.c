@@ -47,7 +47,7 @@ void PolyPrint(const Poly *p) {
  * @param[in] poly : wielomian
  * @param[in] m : jednomian
  */
-void insertMonoToPoly(Poly *poly, Mono *m) {
+void InsertMonoToPoly(Poly *poly, Mono *m) {
     poly->arr = realloc(poly->arr, (poly->size + 1) * sizeof(Mono));
     CHECK_PTR(poly->arr);
     (poly->arr)[poly->size] = *m;
@@ -69,7 +69,7 @@ void PolyDestroy(Poly *p) {
  * @param[in] p2 : wskaźnik rzutowalny na jednomianowy.
  * @return Różnica wartości wykładników jednomianów.
  */
-static poly_exp_t comparatorExponents(const void *p1, const void *p2) {
+static poly_exp_t ComparatorExponents(const void *p1, const void *p2) {
     Mono *mono1 = (Mono *) p1;
     Mono *mono2 = (Mono *) p2;
     return mono1->exp - mono2->exp;
@@ -98,7 +98,7 @@ Poly PolyClone(const Poly *p) {
  * @param[in] x : Liczba (współczynnik) do dodania.
  * @return Wielomian będący wynikiem dodawania.
  */
-Poly addNumberToPoly(const Poly *p, poly_coeff_t x) {
+Poly AddNumberToPoly(const Poly *p, poly_coeff_t x) {
     Poly p_copy;
     Mono m;
     m.p = PolyFromCoeff(x);
@@ -142,7 +142,7 @@ static void Simplify(Poly *poly) {
         PolyDestroy(poly);
         *poly = res;
     } else {
-        qsort(poly->arr, poly->size, sizeof(Mono), comparatorExponents);
+        qsort(poly->arr, poly->size, sizeof(Mono), ComparatorExponents);
     }
 }
 
@@ -154,9 +154,9 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
         result.coeff = p->coeff + q->coeff;
         return result;
     } else if (PolyIsCoeff(p) && !PolyIsCoeff(q)) {
-        result = addNumberToPoly(q, p->coeff);
+        result = AddNumberToPoly(q, p->coeff);
     } else if (!PolyIsCoeff(p) && PolyIsCoeff(q)) {
-        result = addNumberToPoly(p, q->coeff);
+        result = AddNumberToPoly(p, q->coeff);
     } else {
         size_t i, j;
         i = j = 0;
@@ -165,17 +165,17 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
             poly_exp_t exp_j = MonoGetExp(q->arr + j);
             if (exp_i < exp_j) {
                 Mono my_mono = MonoClone(p->arr + i);
-                insertMonoToPoly(&result, &my_mono);
+                InsertMonoToPoly(&result, &my_mono);
                 i++;
             } else if (exp_j < exp_i) {
                 Mono my_mono = MonoClone(q->arr + j);
-                insertMonoToPoly(&result, &my_mono);
+                InsertMonoToPoly(&result, &my_mono);
                 j++;
             } else {
                 Poly add_result = PolyAdd(&p->arr[i].p, &q->arr[j].p);
                 if (!PolyIsZero(&add_result)) {
                     Mono to_add = MonoFromPoly(&add_result, MonoGetExp(p->arr + i));
-                    insertMonoToPoly(&result, &to_add);
+                    InsertMonoToPoly(&result, &to_add);
                 }
                 i++;
                 j++;
@@ -183,12 +183,12 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
         }
         while (i < p->size) {
             Mono my_mono = MonoClone(p->arr + i);
-            insertMonoToPoly(&result, &my_mono);
+            InsertMonoToPoly(&result, &my_mono);
             i++;
         }
         while (j < q->size) {
             Mono my_mono = MonoClone(q->arr + j);
-            insertMonoToPoly(&result, &my_mono);
+            InsertMonoToPoly(&result, &my_mono);
             j++;
         }
     }
@@ -206,7 +206,7 @@ Poly PolyAddMonos(size_t count, const Mono *monos) {
     for (size_t i = 0; i < count; i++) {
         monos_copy[i] = monos[i];
     }
-    qsort(monos_copy, count, sizeof(Mono), comparatorExponents);
+    qsort(monos_copy, count, sizeof(Mono), ComparatorExponents);
     size_t i = 0;
     while (i < count) {
         Poly current_sum = PolyClone(&monos_copy[i].p);
@@ -220,7 +220,7 @@ Poly PolyAddMonos(size_t count, const Mono *monos) {
         Simplify(&current_sum);
         if (!PolyIsZero(&current_sum)) {
             Mono new_mono = MonoFromPoly(&current_sum, MonoGetExp(monos_copy + i));
-            insertMonoToPoly(&result, &new_mono);
+            InsertMonoToPoly(&result, &new_mono);
         }
         i = j;
     }
@@ -400,7 +400,7 @@ bool PolyIsEq(const Poly *p, const Poly *q) {
  * @param[in] exp : Wykładnik operacji potęgowania.
  * @return Wynik potęgowania.
  */
-static poly_coeff_t power(poly_coeff_t x, poly_exp_t exp) {
+static poly_coeff_t Power(poly_coeff_t x, poly_exp_t exp) {
     poly_coeff_t result = 1;
     for (poly_exp_t i = 0; i < exp; i++) {
         result *= x;
@@ -416,7 +416,7 @@ Poly PolyAt(const Poly *p, poly_coeff_t x) {
     }
     for (size_t i = 0; i < p->size; i++) {
         poly_exp_t my_exponent = p->arr[i].exp;
-        poly_coeff_t constant = power(x, my_exponent);
+        poly_coeff_t constant = Power(x, my_exponent);
         Poly multiplier = PolyFromCoeff(constant);
         Poly current = PolyMul(&multiplier, &p->arr[i].p);
         Poly temp_result = PolyAdd(&result, &current);

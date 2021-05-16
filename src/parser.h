@@ -8,10 +8,10 @@
 #endif //POLYNOMIALS_PARSER_H
 
 
-Poly parsePoly(char **line, bool *err);
+Poly ParsePoly(char **line, bool *err);
 
-Poly parsePolyUtil(char **line, bool *err);
+Poly ParsePolyUtil(char **line, bool *err);
 
-Mono parseMono(char **line, bool *err);
+Mono ParseMono(char **line, bool *err);
 
-void runCommand(Stack *s, char *line, int lineNumber);
+void RunCommand(Stack *s, char *line, int lineNumber);
