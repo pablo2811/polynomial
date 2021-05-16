@@ -161,7 +161,7 @@ void RunCommand(Stack *s, char *line, int lineNumber) {
             !EachSignNumerical(argumentString + 1)) {
             fprintf(stderr, "ERROR %d AT WRONG VALUE\n", lineNumber);
         } else {
-            at(s, argument, &err);
+            At(s, argument, &err);
         }
     } else if (StartsWith(line, "DEG_BY")) {
         argumentString = line + 7;
@@ -170,32 +170,32 @@ void RunCommand(Stack *s, char *line, int lineNumber) {
             !EachSignNumerical(argumentString)) {
             fprintf(stderr, "ERROR %d DEG BY WRONG VARIABLE\n", lineNumber);
         } else {
-            degBy(s, argument, &err);
+            DegBy(s, argument, &err);
         }
     } else if (strcmp(line, "ZERO\n") == 0) {
-        zero(s);
+        Zero(s);
     } else if (strcmp(line, "IS_COEFF\n") == 0) {
-        isCoeff(s, &err);
+        IsCoeff(s, &err);
     } else if (strcmp(line, "IS_ZERO\n") == 0) {
-        isZero(s, &err);
+        IsZero(s, &err);
     } else if (strcmp(line, "CLONE\n") == 0) {
-        clone(s, &err);
+        Clone(s, &err);
     } else if (strcmp(line, "ADD\n") == 0) {
-        add(s, &err);
+        Add(s, &err);
     } else if (strcmp(line, "MUL\n") == 0) {
-        mul(s, &err);
+        Mul(s, &err);
     } else if (strcmp(line, "NEG\n") == 0) {
-        neg(s, &err);
+        Neg(s, &err);
     } else if (strcmp(line, "SUB\n") == 0) {
-        sub(s, &err);
+        Sub(s, &err);
     } else if (strcmp(line, "IS_EQ\n") == 0) {
-        isEq(s, &err);
+        IsEq(s, &err);
     } else if (strcmp(line, "DEG\n") == 0) {
-        deg(s, &err);
+        Deg(s, &err);
     } else if (strcmp(line, "PRINT\n") == 0) {
-        print(s, &err);
+        Print(s, &err);
     } else if (strcmp(line, "POP\n") == 0) {
-        pop(s, &err);
+        Pop(s, &err);
     } else {
         fprintf(stderr, "ERROR %d WRONG COMMAND\n", lineNumber);
     }
