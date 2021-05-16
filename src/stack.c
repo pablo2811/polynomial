@@ -14,6 +14,7 @@ Poly PopStack(Stack *s, bool *err) {
         *err = true;
         return PolyZero();
     }
+
     (s->amount)--;
     return s->stack[s->amount];
 
@@ -24,6 +25,7 @@ Poly TopStack(Stack *s, bool *err) {
         *err = true;
         return PolyZero();
     }
+
     return s->stack[s->amount - 1];
 }
 
@@ -33,16 +35,19 @@ void PushStack(Stack *s, const Poly *p) {
         s->capacity *= 2;
         CHECK_PTR(s->stack);
     }
+
     s->stack[s->amount] = *p;
     (s->amount)++;
 }
 
 Stack GetEmptyStack() {
     Stack s;
+
     s.stack = malloc(sizeof(Poly));
     CHECK_PTR(s.stack);
     s.amount = 0;
     s.capacity = 1;
+
     return s;
 }
 

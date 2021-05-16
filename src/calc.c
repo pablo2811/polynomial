@@ -9,6 +9,7 @@
 #define COMMENT_SIGN '#'
 
 void StackKill(Stack *myStack) {
+
     for (int i = 0; i < myStack->amount; i++) {
         PolyDestroy(myStack->stack + i);
     }
@@ -21,10 +22,12 @@ void Run() {
     ssize_t characters;
     int lineNumber = 0;
     Stack myStack = GetEmptyStack();
+
     while ((characters = getline(&buffer, &bufsize, stdin)) != -1) {
         bool err = false;
         char *ptr = buffer;
         lineNumber++;
+
         if (characters <= 1 || (characters > 0 && *buffer == COMMENT_SIGN)) {
             continue;
         }
@@ -41,6 +44,7 @@ void Run() {
         free(ptr);
         buffer = NULL;
     }
+
     free(buffer);
     StackKill(&myStack);
 }

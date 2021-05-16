@@ -13,8 +13,10 @@ long GetCoeff(char **line, bool *isCoeff) {
         *isCoeff = false;
         return 0;
     }
+
     char *endptr;
     long argument = strtol(*line, &endptr, 10);
+
     if (endptr == *line || ((argument == LONG_MAX || argument == LONG_MIN) && errno == ERANGE)) {
         *isCoeff = false;
     } else {
@@ -22,6 +24,7 @@ long GetCoeff(char **line, bool *isCoeff) {
         *line = endptr;
         return argument;
     }
+
     return 0;
 }
 
@@ -30,8 +33,10 @@ int GetExponent(char **line, bool *isExponent) {
         *isExponent = false;
         return 0;
     }
+
     char *endptr;
     long argument = strtol(*line, &endptr, 10);
+
     if (endptr == *line || (argument == LONG_MAX && errno == ERANGE) || (argument < 0 || argument >= INT_MAX)) {
         *isExponent = false;
     } else {
@@ -39,6 +44,7 @@ int GetExponent(char **line, bool *isExponent) {
         *isExponent = true;
         return (int) argument;
     }
+
     return 0;
 }
 
@@ -49,11 +55,13 @@ bool EachSignNumerical(const char *string) {
         }
         string++;
     }
+
     return true;
 }
 
 bool StartsWith(const char *str, const char *pre) {
     size_t lenpre = strlen(pre), lenstr = strlen(str);
+
     return lenstr < lenpre ? false : memcmp(pre, str, lenpre) == 0;
 }
 
@@ -63,9 +71,11 @@ void SimpleCheck(const char *line, bool *err) {
     char *copyBeg = copy;
     strcpy(copy, line);
     GetCoeff(&copy, &isCoeff);
+
     if ((isCoeff && *copy != '\n') || (!isCoeff && *copy != '(')) {
         *err = true;
     }
+
     free(copyBeg);
 }
 
@@ -73,6 +83,7 @@ void AdvancedCheck(const char *line, bool *err) {
     char *goodChars = "(),+-";
     int openBrackets, closedBrackets;
     openBrackets = closedBrackets = 0;
+
     while (*line != '\n') {
         if (strchr(goodChars, *line) == NULL && !isdigit(*line)) {
             *err = true;
@@ -86,6 +97,7 @@ void AdvancedCheck(const char *line, bool *err) {
         }
         line++;
     }
+
     if (openBrackets != closedBrackets) {
         *err = true;
     }
@@ -94,9 +106,11 @@ void AdvancedCheck(const char *line, bool *err) {
 Poly ParsePoly(char **line, bool *err) {
     SimpleCheck(*line, err);
     AdvancedCheck(*line, err);
+
     if (*err) {
         return PolyZero();
     }
+
     return ParsePolyUtil(line, err);
 }
 
@@ -104,10 +118,12 @@ Poly ParsePoly(char **line, bool *err) {
 Poly ParsePolyUtil(char **line, bool *err) {
     bool isCoeff;
     long long coeff = GetCoeff(line, &isCoeff);
+    Poly temp = PolyZero();
+
     if (isCoeff) {
         return PolyFromCoeff(coeff);
     }
-    Poly temp = PolyZero();
+
     while (**line != ',' && **line != '\n' && !*err) {
         Mono current;
         if (**line == '(') {
@@ -123,29 +139,36 @@ Poly ParsePolyUtil(char **line, bool *err) {
             *err = true;
         }
     }
+
     Poly result = PolyAddMonos(temp.size, temp.arr);
     free(temp.arr);
+
     return result;
 }
 
 Mono ParseMono(char **line, bool *err) {
     bool isExp;
+
     if (**line == '(') {
+
         (*line)++;
         Poly coeff = ParsePolyUtil(line, err);
         if (**line != ',') {
             *err = true;
         }
+
         (*line)++;
         int exp = GetExponent(line, &isExp);
         if (**line != ')' || !isExp) {
             *err = true;
         }
+
         (*line)++;
         return (Mono) {.p = coeff, .exp = exp};
     } else {
         *err = true;
         Poly fooPoly = PolyZero();
+
         return MonoFromPoly(&fooPoly, 1);
     }
 }
@@ -153,9 +176,11 @@ Mono ParseMono(char **line, bool *err) {
 void RunCommand(Stack *s, char *line, int lineNumber) {
     bool err = false;
     char *endptr, *argumentString;
+
     if (StartsWith(line, "AT")) {
         argumentString = line + 2;
         long long argument = strtoll(argumentString, &endptr, 10);
+
         if (*argumentString != ' ' || endptr == argumentString ||
             ((argument == LLONG_MAX || argument == LLONG_MIN) && errno == ERANGE) ||
             !EachSignNumerical(argumentString + 1)) {
@@ -163,15 +188,18 @@ void RunCommand(Stack *s, char *line, int lineNumber) {
         } else {
             At(s, argument, &err);
         }
+
     } else if (StartsWith(line, "DEG_BY")) {
         argumentString = line + 7;
         long argument = strtol(argumentString, &endptr, 10);
+
         if (endptr == argumentString || (argument == LONG_MAX && errno == ERANGE) ||
             !EachSignNumerical(argumentString)) {
             fprintf(stderr, "ERROR %d DEG BY WRONG VARIABLE\n", lineNumber);
         } else {
             DegBy(s, argument, &err);
         }
+
     } else if (strcmp(line, "ZERO\n") == 0) {
         Zero(s);
     } else if (strcmp(line, "IS_COEFF\n") == 0) {
@@ -202,4 +230,5 @@ void RunCommand(Stack *s, char *line, int lineNumber) {
     if (err) {
         fprintf(stderr, "ERROR %d STACK UNDERFLOW\n", lineNumber);
     }
+
 }
