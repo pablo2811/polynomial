@@ -7,7 +7,10 @@
 
 #endif //POLYNOMIALS_PARSER_H
 
+
 Poly parsePoly(char **line, bool *err);
+
+Poly parsePolyUtil(char **line, bool *err);
 
 Mono parseMono(char **line, bool *err);
 

@@ -9,7 +9,7 @@
 
 long getCoeff(char **line, bool *isCoeff) {
     char *endptr;
-    long long argument = strtol(*line, &endptr, 10);
+    long argument = strtol(*line, &endptr, 10);
     if (endptr == *line || ((argument == LONG_MAX || argument == LONG_MIN) && errno == ERANGE)) {
         *isCoeff = false;
     } else {
@@ -20,15 +20,15 @@ long getCoeff(char **line, bool *isCoeff) {
     return 0;
 }
 
-long getExponent(char **line, bool *isExponent) {
+int getExponent(char **line, bool *isExponent) {
     char *endptr;
     long argument = strtol(*line, &endptr, 10);
-    if (endptr == *line || (argument == LONG_MAX && errno == ERANGE)) {
+    if (endptr == *line || (argument == LONG_MAX && errno == ERANGE) || (argument < 0 || argument >= INT_MAX)) {
         *isExponent = false;
     } else {
         *line = endptr;
         *isExponent = true;
-        return argument;
+        return (int) argument;
     }
     return 0;
 }
@@ -48,8 +48,36 @@ bool startsWith(const char *str, const char *pre) {
     return lenstr < lenpre ? false : memcmp(pre, str, lenpre) == 0;
 }
 
+void simpleCheck(const char *line, bool *err) {
+    char *goodChars = "(),+-";
+    int openBrackets, closedBrackets;
+    openBrackets = closedBrackets = 0;
+    while (*line != '\n') {
+        if (strchr(goodChars, *line) == NULL && (*line - '0' < 0 || *line - '0' > 9)) {
+            *err = true;
+            break;
+        }
+        openBrackets += (*line == '(');
+        closedBrackets += (*line == ')');
+        if (openBrackets < closedBrackets) {
+            *err = true;
+            break;
+        }
+        line++;
+    }
+    if (openBrackets != closedBrackets){
+        *err = true;
+    }
+}
 
 Poly parsePoly(char **line, bool *err) {
+    simpleCheck(*line, err);
+    if (*err) return PolyZero();
+    return parsePolyUtil(line, err);
+}
+
+
+Poly parsePolyUtil(char **line, bool *err) {
     bool isCoeff;
     long long coeff = getCoeff(line, &isCoeff);
     if (isCoeff) return PolyFromCoeff(coeff);
@@ -77,13 +105,13 @@ Mono parseMono(char **line, bool *err) {
     bool isExp;
     if (**line == '(') {
         (*line)++;
-        Poly coeff = parsePoly(line, err);
+        Poly coeff = parsePolyUtil(line, err);
         if (**line != ',') *err = true;
         (*line)++;
-        long exp = getExponent(line, &isExp);
+        int exp = getExponent(line, &isExp);
         if (**line != ')' || !isExp) *err = true;
         (*line)++;
-        return (Mono) {.p = coeff, .exp = (int) exp};
+        return (Mono) {.p = coeff, .exp = exp};
     } else {
         *err = true;
         Poly fooPoly = PolyZero();
