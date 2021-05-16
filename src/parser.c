@@ -3,11 +3,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
+#include <ctype.h>
 
 #include "parser.h"
 #include "command_handler.h"
 
 long getCoeff(char **line, bool *isCoeff) {
+    if (**line == '+') {
+        *isCoeff = false;
+        return 0;
+    }
     char *endptr;
     long argument = strtol(*line, &endptr, 10);
     if (endptr == *line || ((argument == LONG_MAX || argument == LONG_MIN) && errno == ERANGE)) {
@@ -21,6 +26,10 @@ long getCoeff(char **line, bool *isCoeff) {
 }
 
 int getExponent(char **line, bool *isExponent) {
+    if (**line == '+') {
+        *isExponent = false;
+        return 0;
+    }
     char *endptr;
     long argument = strtol(*line, &endptr, 10);
     if (endptr == *line || (argument == LONG_MAX && errno == ERANGE) || (argument < 0 || argument >= INT_MAX)) {
@@ -49,11 +58,19 @@ bool startsWith(const char *str, const char *pre) {
 }
 
 void simpleCheck(const char *line, bool *err) {
+    bool isCoeff;
+    char *copy = malloc(strlen(line) + 1);
+    strcpy(copy, line);
+    getCoeff(&copy, &isCoeff);
+    if ((isCoeff && *copy != '\n') || (!isCoeff && *copy != '(')) *err = true;
+}
+
+void advancedCheck(const char *line, bool *err) {
     char *goodChars = "(),+-";
     int openBrackets, closedBrackets;
     openBrackets = closedBrackets = 0;
     while (*line != '\n') {
-        if (strchr(goodChars, *line) == NULL && (*line - '0' < 0 || *line - '0' > 9)) {
+        if (strchr(goodChars, *line) == NULL && !isdigit(*line)) {
             *err = true;
             break;
         }
@@ -65,13 +82,14 @@ void simpleCheck(const char *line, bool *err) {
         }
         line++;
     }
-    if (openBrackets != closedBrackets){
+    if (openBrackets != closedBrackets) {
         *err = true;
     }
 }
 
 Poly parsePoly(char **line, bool *err) {
     simpleCheck(*line, err);
+    advancedCheck(*line, err);
     if (*err) return PolyZero();
     return parsePolyUtil(line, err);
 }
@@ -84,20 +102,16 @@ Poly parsePolyUtil(char **line, bool *err) {
     Poly temp = PolyZero();
     while (**line != ',' && **line != '\n' && !*err) {
         Mono current;
-        switch (**line) {
-            case '(':
-                current = parseMono(line, err);
-                insertMonoToPoly(&temp, &current);
-                break;
-            case '+':
-                (*line)++;
-                break;
-            default:
-                *err = true;
-
+        if (**line == '(') {
+            current = parseMono(line, err);
+            insertMonoToPoly(&temp, &current);
+            if (**line != ',' && **line != '+' && **line != '\n') *err = true;
+            if (**line == '+' && *(*line + 1) == '\n') *err = true;
+            if (**line != '\n' && **line != ',') (*line)++;
+        } else {
+            *err = true;
         }
     }
-
     return PolyAddMonos(temp.size, temp.arr);
 }
 
@@ -134,8 +148,8 @@ void runCommand(Stack *s, char *line, int lineNumber) {
         }
     } else if (startsWith(line, "DEG_BY")) {
         argumentString = line + 7;
-        unsigned long long argument = strtoull(argumentString, &endptr, 10);
-        if (endptr == argumentString || (argument == ULLONG_MAX && errno == ERANGE) ||
+        long argument = strtol(argumentString, &endptr, 10);
+        if (endptr == argumentString || (argument == LONG_MAX && errno == ERANGE) ||
             !eachSignNumerical(argumentString)) {
             fprintf(stderr, "ERROR %d DEG BY WRONG VARIABLE\n", lineNumber);
         } else {
