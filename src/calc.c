@@ -8,6 +8,13 @@
 
 #define COMMENT_SIGN '#'
 
+void stackKill(Stack *myStack) {
+    for (int i = 0; i < myStack->amount; i++) {
+        PolyDestroy(myStack->stack + i);
+    }
+    free(myStack);
+}
+
 void run() {
     char *buffer = NULL;
     size_t bufsize = 0;
@@ -32,6 +39,8 @@ void run() {
         free(ptr);
         buffer = NULL;
     }
+    free(buffer);
+    stackKill(&myStack);
 }
 
 

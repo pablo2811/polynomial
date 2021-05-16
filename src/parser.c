@@ -59,10 +59,12 @@ bool startsWith(const char *str, const char *pre) {
 
 void simpleCheck(const char *line, bool *err) {
     bool isCoeff;
-    char *copy = malloc(strlen(line) + 1);
+    char *copy = malloc((strlen(line) + 1) * (sizeof(char)));
+    char *copyBeg = copy;
     strcpy(copy, line);
     getCoeff(&copy, &isCoeff);
     if ((isCoeff && *copy != '\n') || (!isCoeff && *copy != '(')) *err = true;
+    free(copyBeg);
 }
 
 void advancedCheck(const char *line, bool *err) {
@@ -112,7 +114,9 @@ Poly parsePolyUtil(char **line, bool *err) {
             *err = true;
         }
     }
-    return PolyAddMonos(temp.size, temp.arr);
+    Poly result = PolyAddMonos(temp.size, temp.arr);
+    free(temp.arr);
+    return result;
 }
 
 Mono parseMono(char **line, bool *err) {
