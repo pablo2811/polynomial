@@ -131,12 +131,16 @@ Poly ParsePolyUtil(char **line, bool *err) {
             InsertMonoToPoly(&temp, &current);
             if ((**line != ',' && **line != '+' && **line != '\n') || (**line == '+' && *(*line + 1) == '\n')) {
                 *err = true;
+                PolyDestroy(&temp);
+                return PolyZero();
             }
             if (**line != '\n' && **line != ',') {
                 (*line)++;
             }
         } else {
             *err = true;
+            PolyDestroy(&temp);
+            return PolyZero();
         }
     }
 
@@ -148,6 +152,7 @@ Poly ParsePolyUtil(char **line, bool *err) {
 
 Mono ParseMono(char **line, bool *err) {
     bool isExp;
+    Poly fooPoly = PolyZero();
 
     if (**line == '(') {
 
@@ -155,21 +160,21 @@ Mono ParseMono(char **line, bool *err) {
         Poly coeff = ParsePolyUtil(line, err);
         if (**line != ',') {
             *err = true;
+            return MonoFromPoly(&fooPoly, 0);
         }
 
         (*line)++;
         int exp = GetExponent(line, &isExp);
         if (**line != ')' || !isExp) {
             *err = true;
+            return MonoFromPoly(&fooPoly, 0);
         }
 
         (*line)++;
         return (Mono) {.p = coeff, .exp = exp};
     } else {
         *err = true;
-        Poly fooPoly = PolyZero();
-
-        return MonoFromPoly(&fooPoly, 1);
+        return MonoFromPoly(&fooPoly, 0);
     }
 }
 

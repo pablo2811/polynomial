@@ -22,7 +22,6 @@ void Run() {
     ssize_t characters;
     int lineNumber = 0;
     Stack myStack = GetEmptyStack();
-
     while ((characters = getline(&buffer, &bufsize, stdin)) != -1) {
         bool err = false;
         char *ptr = buffer;
