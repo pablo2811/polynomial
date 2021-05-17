@@ -309,15 +309,15 @@
 //  return res;
 //}
 //
-////int main() {
-////  assert(SimpleAddTest());
-////  assert(SimpleAddMonosTest());
-////  assert(SimpleMulTest());
-////  assert(SimpleNegTest());
-////  assert(SimpleSubTest());
-////  assert(SimpleDegByTest());
-////  assert(SimpleDegTest());
-////  assert(SimpleIsEqTest());
-////  assert(SimpleAtTest());
-////  assert(OverflowTest());
-////}
+//int main() {
+//  assert(SimpleAddTest());
+//  assert(SimpleAddMonosTest());
+//  assert(SimpleMulTest());
+//  assert(SimpleNegTest());
+//  assert(SimpleSubTest());
+//  assert(SimpleDegByTest());
+//  assert(SimpleDegTest());
+//  assert(SimpleIsEqTest());
+//  assert(SimpleAtTest());
+//  assert(OverflowTest());
+//}

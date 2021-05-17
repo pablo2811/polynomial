@@ -23,7 +23,7 @@ void Zero(Stack *s) {
 }
 
 
-void IsCoeff(Stack *s, bool *err) {
+void IsCoefficient(Stack *s, bool *err) {
     Poly top = TopStack(s, err);
 
     if (*err) {

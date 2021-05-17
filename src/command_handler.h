@@ -5,7 +5,7 @@
 
 void Zero(Stack *s);
 
-void IsCoeff(Stack *s, bool *err);
+void IsCoefficient(Stack *s, bool *err);
 
 void IsZero(Stack *s, bool *err);
 

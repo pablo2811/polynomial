@@ -10,14 +10,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+void PolyPrintUtil(const Poly *poly);
+
 static void check_ptr(void *ptr) {
     if (ptr == NULL) {
         exit(1);
     }
 }
 
-
-void PolyPrintUtil(const Poly *poly);
 
 void MonoPrint(const Mono *mono) {
     printf("(");
@@ -80,6 +80,7 @@ void PolyDestroy(Poly *p) {
 static poly_exp_t ComparatorExponents(const void *p1, const void *p2) {
     Mono *mono1 = (Mono *) p1;
     Mono *mono2 = (Mono *) p2;
+
     return mono1->exp - mono2->exp;
 }
 
@@ -190,6 +191,7 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
         while (i < p->size && j < q->size) {
             poly_exp_t exp_i = MonoGetExp(p->arr + i);
             poly_exp_t exp_j = MonoGetExp(q->arr + j);
+
             if (exp_i < exp_j) {
                 Mono my_mono = MonoClone(p->arr + i);
                 InsertMonoToPoly(&result, &my_mono);
@@ -200,6 +202,7 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
                 j++;
             } else {
                 Poly add_result = PolyAdd(&p->arr[i].p, &q->arr[j].p);
+
                 if (!PolyIsZero(&add_result)) {
                     Mono to_add = MonoFromPoly(&add_result, MonoGetExp(p->arr + i));
                     InsertMonoToPoly(&result, &to_add);
