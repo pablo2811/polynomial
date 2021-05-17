@@ -222,8 +222,6 @@ Poly PolyAt(const Poly *p, poly_coeff_t x);
 
 void MonoPrint(const Mono *mono);
 
-void PolyPrintUtil(const Poly *poly);
-
 void PolyPrint(const Poly *p);
 
 void InsertMonoToPoly(Poly *poly, Mono *m);

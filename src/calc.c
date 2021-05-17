@@ -8,28 +8,32 @@
 
 #define COMMENT_SIGN '#'
 
-void StackKill(Stack myStack) {
+static void StackKill(Stack myStack) {
 
     for (int i = 0; i < myStack.amount; i++) {
         PolyDestroy(myStack.stack + i);
     }
+
     free(myStack.stack);
 }
 
 void Run() {
     char *buffer = NULL;
-    size_t bufsize = 0;
-    ssize_t characters;
+    size_t bufferSize = 0;
+    ssize_t characters = getline(&buffer, &bufferSize, stdin);
     int lineNumber = 0;
     Stack myStack = GetEmptyStack();
-    while ((characters = getline(&buffer, &bufsize, stdin)) != -1) {
+
+    while (characters != -1) {
         bool err = false;
         char *ptr = buffer;
         lineNumber++;
 
         if (characters <= 1 || (characters > 0 && *buffer == COMMENT_SIGN)) {
+            characters = getline(&buffer, &bufferSize, stdin);
             continue;
         }
+
         if (isalpha(*buffer)) {
             RunCommand(&myStack, buffer, lineNumber);
         } else {
@@ -41,8 +45,10 @@ void Run() {
                 PushStack(&myStack, &parsed);
             }
         }
+
         free(ptr);
         buffer = NULL;
+        characters = getline(&buffer, &bufferSize, stdin);
     }
 
     free(buffer);
@@ -52,6 +58,7 @@ void Run() {
 
 int main() {
     Run();
+
     return 0;
 }
 

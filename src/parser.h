@@ -10,8 +10,4 @@
 
 Poly ParsePoly(char **line, bool *err);
 
-Poly ParsePolyUtil(char **line, bool *err);
-
-Mono ParseMono(char **line, bool *err);
-
 void RunCommand(Stack *s, char *line, int lineNumber);

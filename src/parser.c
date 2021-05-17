@@ -8,7 +8,11 @@
 #include "parser.h"
 #include "command_handler.h"
 
-long GetCoeff(char **line, bool *isCoeff) {
+static Poly ParsePolyUtil(char **line, bool *err);
+
+static Mono ParseMono(char **line, bool *err);
+
+static long GetCoeff(char **line, bool *isCoeff) {
     if (**line == '+') {
         *isCoeff = false;
         return 0;
@@ -28,7 +32,7 @@ long GetCoeff(char **line, bool *isCoeff) {
     return 0;
 }
 
-int GetExponent(char **line, bool *isExponent) {
+static int GetExponent(char **line, bool *isExponent) {
     if (**line == '+') {
         *isExponent = false;
         return 0;
@@ -48,7 +52,7 @@ int GetExponent(char **line, bool *isExponent) {
     return 0;
 }
 
-bool EachSignNumerical(const char *string) {
+static bool EachSignNumerical(const char *string) {
     while (*string != '\0' && *string != '\n') {
         if (*string - '0' > 10 || *string - '0' < 0) {
             return false;
@@ -59,13 +63,13 @@ bool EachSignNumerical(const char *string) {
     return true;
 }
 
-bool StartsWith(const char *str, const char *pre) {
+static bool StartsWith(const char *str, const char *pre) {
     size_t lenpre = strlen(pre), lenstr = strlen(str);
 
     return lenstr < lenpre ? false : memcmp(pre, str, lenpre) == 0;
 }
 
-void SimpleCheck(const char *line, bool *err) {
+static void SimpleCheck(const char *line, bool *err) {
     bool isCoeff;
     char *copy = malloc((strlen(line) + 1) * (sizeof(char)));
     char *copyBeg = copy;
@@ -79,7 +83,7 @@ void SimpleCheck(const char *line, bool *err) {
     free(copyBeg);
 }
 
-void AdvancedCheck(const char *line, bool *err) {
+static void AdvancedCheck(const char *line, bool *err) {
     char *goodChars = "(),+-";
     int openBrackets, closedBrackets;
     openBrackets = closedBrackets = 0;
@@ -115,7 +119,7 @@ Poly ParsePoly(char **line, bool *err) {
 }
 
 
-Poly ParsePolyUtil(char **line, bool *err) {
+static Poly ParsePolyUtil(char **line, bool *err) {
     bool isCoeff;
     long long coeff = GetCoeff(line, &isCoeff);
     Poly temp = PolyZero();
@@ -150,7 +154,7 @@ Poly ParsePolyUtil(char **line, bool *err) {
     return result;
 }
 
-Mono ParseMono(char **line, bool *err) {
+static Mono ParseMono(char **line, bool *err) {
     bool isExp;
     Poly fooPoly = PolyZero();
 

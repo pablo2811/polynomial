@@ -18,4 +18,3 @@ Poly TopStack(Stack *s, bool *err);
 void PushStack(Stack *s, const Poly *p);
 
 Stack GetEmptyStack();
-

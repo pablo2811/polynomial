@@ -1,12 +1,11 @@
 #include <stdlib.h>
 #include "stack.h"
 
-#define CHECK_PTR(p) \
-    do {         \
-        if (p == NULL) { \
-            exit(1); \
-        } \
-    } while (0) \
+static void check_ptr(void *ptr) {
+    if (ptr == NULL) {
+        exit(1);
+    }
+}
 
 
 Poly PopStack(Stack *s, bool *err) {
@@ -33,7 +32,7 @@ void PushStack(Stack *s, const Poly *p) {
     if (s->amount == s->capacity) {
         s->stack = realloc(s->stack, sizeof(Poly) * (2 * s->capacity));
         s->capacity *= 2;
-        CHECK_PTR(s->stack);
+        check_ptr(s->stack);
     }
 
     s->stack[s->amount] = *p;
@@ -44,7 +43,7 @@ Stack GetEmptyStack() {
     Stack s;
 
     s.stack = malloc(sizeof(Poly));
-    CHECK_PTR(s.stack);
+    check_ptr(s.stack);
     s.amount = 0;
     s.capacity = 1;
 

@@ -10,14 +10,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define CHECK_PTR(p) \
-    do {         \
-        if (p == NULL) { \
-            exit(1); \
-        } \
-    } while (0)      \
+static void check_ptr(void *ptr) {
+    if (ptr == NULL) {
+        exit(1);
+    }
+}
 
 
+void PolyPrintUtil(const Poly *poly);
 
 void MonoPrint(const Mono *mono) {
     printf("(");
@@ -54,7 +54,7 @@ void PolyPrint(const Poly *p) {
  */
 void InsertMonoToPoly(Poly *poly, Mono *m) {
     poly->arr = realloc(poly->arr, (poly->size + 1) * sizeof(Mono));
-    CHECK_PTR(poly->arr);
+    check_ptr(poly->arr);
 
     (poly->arr)[poly->size] = *m;
     (poly->size)++;
@@ -96,7 +96,7 @@ Poly PolyClone(const Poly *p) {
         }
 
         result.arr = malloc(sizeof(Mono) * (p->size));
-        CHECK_PTR(result.arr);
+        check_ptr(result.arr);
 
         for (size_t i = 0; i < p->size; i++) {
             result.arr[i] = MonoClone(p->arr + i);
@@ -121,7 +121,7 @@ Poly AddNumberToPoly(const Poly *p, poly_coeff_t x) {
     m.exp = 0;
 
     p_copy.arr = malloc(sizeof(Mono));
-    CHECK_PTR(p_copy.arr);
+    check_ptr(p_copy.arr);
     p_copy.size = 1;
     p_copy.arr[0] = m;
 
@@ -235,7 +235,7 @@ Poly PolyAddMonos(size_t count, const Mono *monos) {
     Poly result = PolyZero();
     result.size = 0;
     Mono *monos_copy = malloc(count * sizeof(Mono));
-    CHECK_PTR(monos_copy);
+    check_ptr(monos_copy);
 
     for (size_t i = 0; i < count; i++) {
         monos_copy[i] = monos[i];
@@ -285,7 +285,7 @@ static Poly PolyCoeffMul(const Poly *p, const Poly *q) {
     }
 
     Mono *tmp = malloc((p->size) * sizeof(Mono));
-    CHECK_PTR(tmp);
+    check_ptr(tmp);
 
     size_t amount_non_zero = 0;
 
@@ -321,7 +321,7 @@ Poly PolyMul(const Poly *p, const Poly *q) {
         return PolyCoeffMul(p, q);
     } else {
         Mono *tmp = malloc((p->size) * (q->size) * sizeof(Mono));
-        CHECK_PTR(tmp);
+        check_ptr(tmp);
 
         size_t amount_non_zero = 0;
 
@@ -360,7 +360,7 @@ Poly PolyNeg(const Poly *p) {
         }
 
         result.arr = malloc(sizeof(Mono) * (p->size));
-        CHECK_PTR(result.arr);
+        check_ptr(result.arr);
         result.size = p->size;
 
         for (size_t i = 0; i < p->size; i++) {
