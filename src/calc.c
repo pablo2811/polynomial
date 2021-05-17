@@ -8,12 +8,12 @@
 
 #define COMMENT_SIGN '#'
 
-void StackKill(Stack *myStack) {
+void StackKill(Stack myStack) {
 
-    for (int i = 0; i < myStack->amount; i++) {
-        PolyDestroy(myStack->stack + i);
+    for (int i = 0; i < myStack.amount; i++) {
+        PolyDestroy(myStack.stack + i);
     }
-    free(myStack);
+    free(myStack.stack);
 }
 
 void Run() {
@@ -47,8 +47,7 @@ void Run() {
     }
 
     free(buffer);
-
-//    StackKill(&myStack);
+    StackKill(myStack);
 }
 
 
