@@ -1,7 +1,7 @@
 /** @file
   Implementacja klasy wielomianów rzadkich wielu zmiennych.
 
-  @authors Paweł Fijałkowski <pf429189@students.mimuw.edu.pl>
+  @author Paweł Fijałkowski <pf429189@students.mimuw.edu.pl>
   @copyright Uniwersytet Warszawski
   @date 2021
 */
@@ -12,13 +12,20 @@
 
 void PolyPrintUtil(const Poly *poly);
 
+/**
+ * Metoda sprawdzająca czy alokacja pamięci przeszła poprawnie.
+ * @param ptr - wskaźnik na zaalokowaną pamięć.
+ */
 static void check_ptr(void *ptr) {
     if (ptr == NULL) {
         exit(1);
     }
 }
 
-
+/**
+ * Funkcja wypisująca podany jako parametr jednomian.
+ * @param mono - Mono, jednomian do wypisania.
+ */
 void MonoPrint(const Mono *mono) {
     printf("(");
     PolyPrintUtil(&(mono->p));
@@ -26,6 +33,11 @@ void MonoPrint(const Mono *mono) {
 
 }
 
+/**
+ * Funkcja pomocnicza wykonująca obliczenia na rzecz `PolyPrint`.
+ * Wypisuje podany jako parametr - wielomian, bez znaku końca linii.
+ * @param poly - wielomian do wypisania bez znaku końca linii.
+ */
 void PolyPrintUtil(const Poly *poly) {
     if (PolyIsCoeff(poly)) {
         printf("%ld", poly->coeff);
@@ -47,11 +59,6 @@ void PolyPrint(const Poly *p) {
 
 }
 
-/**
- * Dodaje nowy jednomian do wielomianu.
- * @param[in] poly : wielomian
- * @param[in] m : jednomian
- */
 void InsertMonoToPoly(Poly *poly, Mono *m) {
     poly->arr = realloc(poly->arr, (poly->size + 1) * sizeof(Mono));
     check_ptr(poly->arr);

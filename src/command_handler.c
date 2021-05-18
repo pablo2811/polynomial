@@ -1,8 +1,25 @@
+/** @file
+  Skypt zawierający funkcje wykonujące polecenia użytkownika kalkulatora wielomianów
+
+  @author Paweł Fijałkowski <pf429189@students.mimuw.edu.pl>
+  @copyright Uniwersytet Warszawski
+  @date 2021
+*/
+
 #include <stdio.h>
 #include <stdbool.h>
 #include "stack.h"
 
-void PolyGetHelper(Stack *s, Poly *componentA, Poly *componentB, bool *err) {
+/**
+ * Jeśli to możliwe, pobiera ze stosu, dwa wielomiany i przypisuje do `componentA`, `componentB`.
+ * Ustawia err = true, jeśli na stosie nie ma conajmniej dwóch elementów.
+ * @param[in] s : Stack
+ * @param[in] componentA : Poly
+ * @param[in] componentB : Poly
+ * @param[in] err : bool
+ */
+
+static void PolyGetHelper(Stack *s, Poly *componentA, Poly *componentB, bool *err) {
     *componentA = PopStack(s, err);
 
     if (*err) {

@@ -1,7 +1,7 @@
 /** @file
   Interfejs klasy wielomianów rzadkich wielu zmiennych
 
-  @authors Jakub Pawlewicz <pan@mimuw.edu.pl>, Marcin Peczarski <marpe@mimuw.edu.pl>
+  @author Jakub Pawlewicz <pan@mimuw.edu.pl>, Marcin Peczarski <marpe@mimuw.edu.pl>
   @copyright Uniwersytet Warszawski
   @date 2021
 */
@@ -220,10 +220,18 @@ bool PolyIsEq(const Poly *p, const Poly *q);
  */
 Poly PolyAt(const Poly *p, poly_coeff_t x);
 
-void MonoPrint(const Mono *mono);
+/**
+ * Dodaje nowy jednomian do wielomianu.
+ * @param[in] poly : wielomian
+ * @param[in] m : jednomian
+ */
+void InsertMonoToPoly(Poly *poly, Mono *m);
 
+/**
+ * Funkcja wypisująca na standardowe wyjście podany wielomian `p`.
+ * @param p - Poly, wielomian do wypisania
+ */
 void PolyPrint(const Poly *p);
 
-void InsertMonoToPoly(Poly *poly, Mono *m);
 
 #endif /* __POLY_H__ */

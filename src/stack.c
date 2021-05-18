@@ -1,6 +1,10 @@
 #include <stdlib.h>
 #include "stack.h"
 
+/**
+ * Metoda sprawdzająca czy alokacja pamięci przeszła poprawnie.
+ * @param ptr - wskaźnik na zaalokowaną pamięć.
+ */
 static void check_ptr(void *ptr) {
     if (ptr == NULL) {
         exit(1);
