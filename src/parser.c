@@ -51,7 +51,7 @@ void RunCommand(Stack *s, char *line, int lineNumber) {
         errno = 0;
         unsigned long long argument = strtoull(argumentString, &endPtr, 10);
 
-        if (*argumentString != ' ' || endPtr == argumentString || errno == ERANGE ||
+        if (*(argumentString - 1) != ' ' || endPtr == argumentString || errno == ERANGE ||
             !EachSignNumerical(argumentString)) {
             fprintf(stderr, "ERROR %d DEG BY WRONG VARIABLE\n", lineNumber);
         } else {
