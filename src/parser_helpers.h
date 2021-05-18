@@ -1,3 +1,10 @@
+/** @file
+  Interfejs funkcji pomocnicznych potrzebnych w procesie parsowania.
+
+  @author Paweł Fijałkowski <pf429189@students.mimuw.edu.pl>
+  @copyright Uniwersytet Warszawski
+  @date 2021
+*/
 
 #ifndef POLYNOMIALS_PARSER_HELPERS_H
 #define POLYNOMIALS_PARSER_HELPERS_H

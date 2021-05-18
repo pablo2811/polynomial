@@ -1,3 +1,11 @@
+/** @file
+  Implementacja operacji wykonywanych na stosie wielomianów rzadkich wielu zmiennych.
+
+  @author Paweł Fijałkowski <pf429189@students.mimuw.edu.pl>
+  @copyright Uniwersytet Warszawski
+  @date 2021
+*/
+
 #include <stdlib.h>
 #include "stack.h"
 

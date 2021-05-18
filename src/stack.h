@@ -1,3 +1,11 @@
+/** @file
+  Interfejs stosu wielomianów rzadkich wielu zmiennych i operacji na nim wykonywanych.
+
+  @author Paweł Fijałkowski <pf429189@students.mimuw.edu.pl>
+  @copyright Uniwersytet Warszawski
+  @date 2021
+*/
+
 #include "poly.h"
 
 #ifndef POLYNOMIALS_STACK_H

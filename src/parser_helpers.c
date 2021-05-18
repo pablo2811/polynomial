@@ -1,3 +1,11 @@
+/** @file
+  Implementacja funkcji pomocnicznych potrzebnych w procesie parsowania.
+
+  @author Paweł Fijałkowski <pf429189@students.mimuw.edu.pl>
+  @copyright Uniwersytet Warszawski
+  @date 2021
+*/
+
 #include <stddef.h>
 #include <stdbool.h>
 #include <string.h>
