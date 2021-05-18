@@ -6,6 +6,9 @@
   @date 2021
 */
 
+/**
+ * Makro konieczne do działania getline.
+ */
 #define  _GNU_SOURCE
 
 #include <stdio.h>
@@ -14,6 +17,9 @@
 #include <ctype.h>
 #include "parser.h"
 
+/**
+ * Oznaczenie znaku komentarza w programie.
+ */
 #define COMMENT_SIGN '#'
 
 /**
@@ -53,7 +59,7 @@ void Run() {
             RunCommand(&myStack, buffer, lineNumber);
         } else {
             Poly parsed = ParsePoly(&buffer, &err);
-            if (err) {
+            if (err || *buffer != '\n') {
                 fprintf(stderr, "ERROR %d WRONG POLY\n", lineNumber);
                 PolyDestroy(&parsed);
             } else {
@@ -70,7 +76,10 @@ void Run() {
     StackKill(myStack);
 }
 
-
+/**
+ * Wejście do kalkulatora wielomianów rzadkich wielu zmiennych.
+ * @return 0
+ */
 int main() {
     Run();
 

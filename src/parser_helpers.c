@@ -21,9 +21,10 @@ long GetCoefficient(char **line, bool *pBoolean) {
     }
 
     char *endPtr;
+    errno = 0;
     long argument = strtol(*line, &endPtr, 10);
 
-    if (endPtr == *line || ((argument == LONG_MAX || argument == LONG_MIN) && errno == ERANGE)) {
+    if (endPtr == *line || errno == ERANGE) {
         *pBoolean = false;
     } else {
         *pBoolean = true;
@@ -97,9 +98,10 @@ int GetExponent(char **line, bool *isExponent) {
     }
 
     char *endPtr;
+    errno = 0;
     long argument = strtol(*line, &endPtr, 10);
 
-    if (endPtr == *line || (argument == LONG_MAX && errno == ERANGE) || (argument < 0 || argument >= INT_MAX)) {
+    if (endPtr == *line || errno == ERANGE || argument < 0 || argument > INT_MAX) {
         *isExponent = false;
     } else {
         *line = endPtr;

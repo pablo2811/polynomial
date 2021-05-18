@@ -121,6 +121,7 @@ void Pop(Stack *s, bool *err);
  * Funkcja realizująca w kalkulatorze polecenie AT
  * (wylicza wartość wielomianu w punkcie x, usuwa wielomian z wierzchołka i wstawia na stos wynik operacji).
  * @param s: Stack
+ * @param x: long long
  * @param err: bool
  */
 void At(Stack *s, long long x, bool *err);

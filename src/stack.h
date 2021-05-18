@@ -15,13 +15,11 @@
 
 /**
  * Struktura reprezentująca stos przechowywanych w programie wielomianów.
- * Zawiera informację o rozmiarze (capacity), ilości przechowywanych wielomianów (amount)
- * i samych wielomianach (stack).
  */
 typedef struct Stack {
-    Poly *stack;
-    int capacity;
-    int amount;
+    Poly *stack; ///< stos wielomianów
+    int capacity; ///< pojemność stosu
+    int amount; ///< ilość wielomianów na stosie
 } Stack;
 
 /**

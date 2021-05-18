@@ -21,13 +21,11 @@
 
 static void PolyGetHelper(Stack *s, Poly *componentA, Poly *componentB, bool *err) {
     *componentA = PopStack(s, err);
-
     if (*err) {
         return;
     }
 
     *componentB = PopStack(s, err);
-
     if (*err) {
         PushStack(s, componentA);
     }

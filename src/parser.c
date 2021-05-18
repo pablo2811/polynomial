@@ -10,7 +10,6 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <limits.h>
 
 #include "parser.h"
 #include "command_handler.h"
@@ -37,10 +36,10 @@ void RunCommand(Stack *s, char *line, int lineNumber) {
 
     if (StartsWith(line, "AT")) {
         argumentString = line + 2;
-        long long argument = strtoll(argumentString, &endPtr, 10);
+        errno = 0;
+        long argument = strtol(argumentString, &endPtr, 10);
 
-        if (*argumentString != ' ' || endPtr == argumentString ||
-            ((argument == LLONG_MAX || argument == LLONG_MIN) && errno == ERANGE) ||
+        if (*argumentString != ' ' || endPtr == argumentString || errno == ERANGE ||
             !EachSignNumerical(argumentString + 1)) {
             fprintf(stderr, "ERROR %d AT WRONG VALUE\n", lineNumber);
         } else {
@@ -49,38 +48,39 @@ void RunCommand(Stack *s, char *line, int lineNumber) {
 
     } else if (StartsWith(line, "DEG_BY")) {
         argumentString = line + 7;
-        long argument = strtol(argumentString, &endPtr, 10);
+        errno = 0;
+        unsigned long long argument = strtoull(argumentString, &endPtr, 10);
 
-        if (endPtr == argumentString || (argument == LONG_MAX && errno == ERANGE) ||
+        if (*argumentString != ' ' || endPtr == argumentString || errno == ERANGE ||
             !EachSignNumerical(argumentString)) {
             fprintf(stderr, "ERROR %d DEG BY WRONG VARIABLE\n", lineNumber);
         } else {
             DegBy(s, argument, &err);
         }
 
-    } else if (strcmp(line, "ZERO\n") == 0) {
+    } else if (strcmp(line, "ZERO\n") == 0 || strcmp(line, "ZERO") == 0) {
         Zero(s);
-    } else if (strcmp(line, "IS_COEFF\n") == 0) {
+    } else if (strcmp(line, "IS_COEFF\n") == 0 || strcmp(line, "IS_COEFF") == 0) {
         IsCoefficient(s, &err);
-    } else if (strcmp(line, "IS_ZERO\n") == 0) {
+    } else if (strcmp(line, "IS_ZERO\n") == 0 || strcmp(line, "IS_ZERO") == 0) {
         IsZero(s, &err);
-    } else if (strcmp(line, "CLONE\n") == 0) {
+    } else if (strcmp(line, "CLONE\n") == 0 || strcmp(line, "CLONE") == 0) {
         Clone(s, &err);
-    } else if (strcmp(line, "ADD\n") == 0) {
+    } else if (strcmp(line, "ADD\n") == 0 || strcmp(line, "ADD") == 0) {
         Add(s, &err);
-    } else if (strcmp(line, "MUL\n") == 0) {
+    } else if (strcmp(line, "MUL\n") == 0 || strcmp(line, "MUL") == 0) {
         Mul(s, &err);
-    } else if (strcmp(line, "NEG\n") == 0) {
+    } else if (strcmp(line, "NEG\n") == 0 || strcmp(line, "NEG") == 0) {
         Neg(s, &err);
-    } else if (strcmp(line, "SUB\n") == 0) {
+    } else if (strcmp(line, "SUB\n") == 0 || strcmp(line, "SUB") == 0) {
         Sub(s, &err);
-    } else if (strcmp(line, "IS_EQ\n") == 0) {
+    } else if (strcmp(line, "IS_EQ\n") == 0 || strcmp(line, "IS_EQ") == 0) {
         IsEq(s, &err);
-    } else if (strcmp(line, "DEG\n") == 0) {
+    } else if (strcmp(line, "DEG\n") == 0 || strcmp(line, "DEG") == 0) {
         Deg(s, &err);
-    } else if (strcmp(line, "PRINT\n") == 0) {
+    } else if (strcmp(line, "PRINT\n") == 0 || strcmp(line, "PRINT") == 0) {
         Print(s, &err);
-    } else if (strcmp(line, "POP\n") == 0) {
+    } else if (strcmp(line, "POP\n") == 0 || strcmp(line, "POP") == 0) {
         Pop(s, &err);
     } else {
         fprintf(stderr, "ERROR %d WRONG COMMAND\n", lineNumber);
@@ -108,6 +108,7 @@ static Poly ParsePolyUtil(char **line, bool *err) {
 
     while (**line != ',' && **line != '\n' && !*err) {
         Mono current;
+
         if (**line == '(') {
             current = ParseMono(line, err);
             InsertMonoToPoly(&temp, &current);
@@ -131,6 +132,7 @@ static Poly ParsePolyUtil(char **line, bool *err) {
 
     return result;
 }
+
 /**
  * Funkcja wykonująca obliczenia na rzecz parsowania jednomianu.
  * @param line - linia zawierająca jednomian do zparsowania.
