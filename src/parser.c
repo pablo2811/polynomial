@@ -58,6 +58,18 @@ void RunCommand(Stack *s, char *line, int lineNumber) {
             DegBy(s, argument, &err);
         }
 
+    }else if(StartsWith(line, "COMPOSE")){
+        argumentString = line + 8;
+        errno = 0;
+        unsigned long long argument = strtoull(argumentString, &endPtr, 10);
+
+        if (*(argumentString - 1) != ' ' || endPtr == argumentString || errno == ERANGE ||
+            !EachSignNumerical(argumentString)) {
+            fprintf(stderr, "ERROR %d COMPOSE WRONG PARAMETER\n", lineNumber);
+        } else {
+            Compose(s, argument, &err);
+        }
+
     } else if (strcmp(line, "ZERO\n") == 0 || strcmp(line, "ZERO") == 0) {
         Zero(s);
     } else if (strcmp(line, "IS_COEFF\n") == 0 || strcmp(line, "IS_COEFF") == 0) {

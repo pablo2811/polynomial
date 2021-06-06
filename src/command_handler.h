@@ -125,3 +125,13 @@ void Pop(Stack *s, bool *err);
  * @param err: bool
  */
 void At(Stack *s, long long x, bool *err);
+
+/**
+ * Funkcja realizująca w kalkulatorze polecenie COMPOSE
+ * @param s: Stack
+ * @param k: ilość wielomianów do złożenia
+ * @param err: bool (błąd)
+ */
+
+void Compose(Stack *s, unsigned long long k, bool *err);
+

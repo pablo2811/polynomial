@@ -233,5 +233,14 @@ void InsertMonoToPoly(Poly *poly, Mono *m);
  */
 void PolyPrint(const Poly *p);
 
+/**
+ * Funkcja realizująca logikę składania wielomianów.
+ * @param p: zewnętrzny wielomian
+ * @param k: ilość wielomianów do złożenia
+ * @param q: tablica wielomianów do złożenia
+ * @return Poly - złożony wielomian
+ */
+Poly PolyCompose(const Poly *p, size_t k, const Poly q[]);
+
 
 #endif /* __POLY_H__ */

@@ -12,6 +12,86 @@
 
 void PolyPrintUtil(const Poly *poly);
 
+static poly_coeff_t Power(poly_coeff_t x, poly_exp_t exp);
+
+
+/**
+ * Metoda zwracająca wynik potęgowania wielomianu `poly` do `exp`.
+ * @param poly - wielomian do spotęgowania
+ * @param exp - wykładnik potęgi wyniku
+ * @return Poly
+ */
+
+static Poly PolyPower(const Poly *poly, poly_exp_t exp) {
+    if (PolyIsCoeff(poly)) {
+        return PolyFromCoeff(Power(poly->coeff, exp));
+    } else {
+        Poly currentMultiplier = PolyClone(poly);
+        Poly result = PolyFromCoeff(1);
+        Poly memoryHelper;
+        while (exp > 0) {
+            if (exp % 2 == 1) {
+                memoryHelper = result;
+                result = PolyMul(&result, &currentMultiplier);
+                PolyDestroy(&memoryHelper);
+            }
+            memoryHelper = currentMultiplier;
+            currentMultiplier = PolyMul(&currentMultiplier, &currentMultiplier);
+            PolyDestroy(&memoryHelper);
+            exp = exp / 2;
+        }
+        PolyDestroy(&currentMultiplier);
+        return result;
+    }
+}
+/**
+ * Funkcja składająca jednomian z odpowiednim wielomianem i zwracająca wynik tego złożenia (wielomian).
+ * @param m: jednomian będący podstawą do złożenia.
+ * @param k: ilość wielomianów pozostałych do złożenia
+ * @param q: tablica wielomianów pozostałych do złożenia
+ * @return Poly: wynik złożenia jednomianu z wielomianem.
+ */
+static Poly MonoCompose(Mono *m, size_t k, const Poly q[]) {
+    Poly powered = PolyPower(q, MonoGetExp(m));
+    Poly polyCompose = PolyCompose(&m->p, k - 1, q + 1);
+    Poly result = PolyMul(&polyCompose, &powered);
+
+    PolyDestroy(&powered);
+    PolyDestroy(&polyCompose);
+
+    return result;
+}
+
+
+
+Poly PolyCompose(const Poly *p, size_t k, const Poly q[]) {
+    if (PolyIsCoeff(p)) {
+        return PolyClone(p);
+    } else {
+
+        if (k == 0 || q == NULL) {
+            Poly insertZero = PolyAt(p, 0);
+            Poly result = PolyCompose(&insertZero, 0, NULL);
+            PolyDestroy(&insertZero);
+
+            return result;
+        }
+
+        Poly result = PolyZero();
+
+        for (size_t i = 0; i < p->size; i++) {
+            Poly current = MonoCompose(p->arr + i, k, q);
+            Poly tmp = result;
+            result = PolyAdd(&result, &current);
+
+            PolyDestroy(&current);
+            PolyDestroy(&tmp);
+        }
+
+        return result;
+    }
+}
+
 /**
  * Metoda sprawdzająca czy alokacja pamięci przeszła poprawnie.
  * @param ptr - wskaźnik na zaalokowaną pamięć.
