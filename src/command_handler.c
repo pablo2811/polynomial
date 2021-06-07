@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <limits.h>
 #include "stack.h"
 
 /**
@@ -189,14 +190,15 @@ void At(Stack *s, long long x, bool *err) {
 }
 
 void Compose(Stack *s, unsigned long long k, bool *err) {
-    if (s->amount < (int) k + 1) {
+
+    if (k == ULLONG_MAX ||  s->amount < (int) k + 1) {
         *err = true;
         return;
     }
 
     Poly main = PopStack(s, err);
     Poly *q = malloc(k * sizeof(Poly));
-    for (size_t u = 0; u < k; u++) {
+    for (int u = (int) k - 1; u >= 0; u--) {
         q[u] = PopStack(s, err);
     }
 

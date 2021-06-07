@@ -38,8 +38,10 @@ static Poly PolyPower(const Poly *poly, poly_exp_t exp) {
             memoryHelper = currentMultiplier;
             currentMultiplier = PolyMul(&currentMultiplier, &currentMultiplier);
             PolyDestroy(&memoryHelper);
-            exp = exp / 2;
+            exp /= 2;
         }
+
+
         PolyDestroy(&currentMultiplier);
         return result;
     }
@@ -80,7 +82,7 @@ Poly PolyCompose(const Poly *p, size_t k, const Poly q[]) {
         Poly result = PolyZero();
 
         for (size_t i = 0; i < p->size; i++) {
-            Poly current = MonoCompose(p->arr + i, k, q);
+            Poly current = MonoCompose(&p->arr[i], k, q);
             Poly tmp = result;
             result = PolyAdd(&result, &current);
 
