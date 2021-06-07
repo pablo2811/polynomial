@@ -191,7 +191,7 @@ void At(Stack *s, long long x, bool *err) {
 
 void Compose(Stack *s, unsigned long long k, bool *err) {
 
-    if (k == ULLONG_MAX ||  s->amount < (int) k + 1) {
+    if (s->amount - 1 < k) {
         *err = true;
         return;
     }
@@ -208,7 +208,7 @@ void Compose(Stack *s, unsigned long long k, bool *err) {
     for (size_t u = 0; u < k; u++) {
         PolyDestroy(q + u);
     }
-
+    PolyDestroy(&main);
     free(q);
 
 }
