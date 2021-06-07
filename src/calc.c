@@ -71,7 +71,6 @@ void Run() {
         buffer = NULL;
         characters = getline(&buffer, &bufferSize, stdin);
     }
-
     free(buffer);
     StackKill(myStack);
 }

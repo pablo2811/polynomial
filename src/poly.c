@@ -46,6 +46,7 @@ static Poly PolyPower(const Poly *poly, poly_exp_t exp) {
         return result;
     }
 }
+
 /**
  * Funkcja składająca jednomian z odpowiednim wielomianem i zwracająca wynik tego złożenia (wielomian).
  * @param m: jednomian będący podstawą do złożenia.
@@ -65,7 +66,6 @@ static Poly MonoCompose(Mono *m, size_t k, const Poly q[]) {
 }
 
 
-
 Poly PolyCompose(const Poly *p, size_t k, const Poly q[]) {
     if (PolyIsCoeff(p)) {
         return PolyClone(p);
@@ -82,7 +82,7 @@ Poly PolyCompose(const Poly *p, size_t k, const Poly q[]) {
         Poly result = PolyZero();
 
         for (size_t i = 0; i < p->size; i++) {
-            Poly current = MonoCompose(&p->arr[i], k, q);
+            Poly current = MonoCompose(p->arr + i, k, q);
             Poly tmp = result;
             result = PolyAdd(&result, &current);
 
@@ -318,49 +318,64 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
     return result;
 }
 
-
-Poly PolyAddMonos(size_t count, const Mono *monos) {
+Poly PolyOwnMonos(size_t count, Mono *monos) {
     if (count == 0) {
         return PolyZero();
     }
 
     Poly result = PolyZero();
     result.size = 0;
-    Mono *monos_copy = malloc(count * sizeof(Mono));
-    check_ptr(monos_copy);
-
-    for (size_t i = 0; i < count; i++) {
-        monos_copy[i] = monos[i];
-    }
-    qsort(monos_copy, count, sizeof(Mono), ComparatorExponents);
+    qsort(monos, count, sizeof(Mono), ComparatorExponents);
 
     size_t i = 0;
 
     while (i < count) {
-        Poly current_sum = PolyClone(&monos_copy[i].p);
+        Poly current_sum = PolyClone(&monos[i].p);
         size_t j = i + 1;
-        while (j < count && MonoGetExp(monos_copy + j) == MonoGetExp(monos_copy + i)) {
-            Poly temp_poly = PolyAdd(&current_sum, &monos_copy[j].p);
+        while (j < count && MonoGetExp(monos + j) == MonoGetExp(monos + i)) {
+            Poly temp_poly = PolyAdd(&current_sum, &monos[j].p);
             PolyDestroy(&current_sum);
             current_sum = temp_poly;
             j++;
         }
         Simplify(&current_sum);
         if (!PolyIsZero(&current_sum)) {
-            Mono new_mono = MonoFromPoly(&current_sum, MonoGetExp(monos_copy + i));
+            Mono new_mono = MonoFromPoly(&current_sum, MonoGetExp(monos + i));
             InsertMonoToPoly(&result, &new_mono);
         }
         i = j;
     }
-
-    for (size_t j = 0; j < count; j++) {
-        MonoDestroy(&monos_copy[j]);
-    }
-
-    free(monos_copy);
     Simplify(&result);
 
+    for (size_t j = 0; j < count; j++) {
+        MonoDestroy(&monos[j]);
+    }
+
+    free(monos);
+
     return result;
+}
+
+Poly PolyCloneMonos(size_t count, const Mono monos[]) {
+    Mono *monos_copy = malloc(count * sizeof(Mono));
+    check_ptr(monos_copy);
+
+    for (size_t i = 0; i < count; i++) {
+        monos_copy[i] = MonoClone(monos + i);
+    }
+    return PolyOwnMonos(count, monos_copy);
+}
+
+
+Poly PolyAddMonos(size_t count, const Mono *monos) {
+    Mono *monos_copy = malloc(count * sizeof(Mono));
+    check_ptr(monos_copy);
+
+    for (size_t i = 0; i < count; i++) {
+        monos_copy[i] = monos[i];
+    }
+
+    return PolyOwnMonos(count, monos_copy);
 }
 
 /**
