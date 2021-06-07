@@ -32,7 +32,7 @@ static Poly MakePolyHelper(poly_exp_t dummy, ...) {
         count++;
     }
     va_start(list, dummy);
-    Mono *arr = calloc(count, sizeof (Mono));
+    Mono *arr = calloc(count, sizeof(Mono));
     CHECK_PTR(arr);
     for (size_t i = 0; i < count; ++i) {
         Poly p = va_arg(list, Poly);
@@ -70,6 +70,15 @@ static bool TestAddMonos(size_t count, Mono monos[], Poly res) {
     return is_eq;
 }
 
+static bool TestCompose(const Poly *p, size_t k, const Poly q[], Poly res) {
+    Poly myRes = PolyCompose(p, k, q);
+    bool is_eq = PolyIsEq(&myRes, &res);
+    PolyDestroy(&myRes);
+    PolyDestroy(&res);
+    return is_eq;
+}
+
+
 static bool TestMul(Poly a, Poly b, Poly res) {
     return TestOp(a, b, res, PolyMul);
 }
@@ -105,6 +114,18 @@ static bool TestAt(Poly a, poly_coeff_t x, Poly res) {
     PolyDestroy(&res);
     return is_eq;
 }
+
+static bool SimpleComposeTest(void) {
+    bool res = true;
+    Poly outer = P(C(1), 2);
+    Poly p[] = {P(C(1), 0, C(1), 1)};
+    Poly result = P(C(1), 0, C(2), 1, C(1), 2);
+    res &= TestCompose(&outer, 1, p, result);
+    PolyDestroy(p);
+    PolyDestroy(&outer);
+    return res;
+}
+
 
 static bool SimpleAddTest(void) {
     bool res = true;
@@ -309,7 +330,10 @@ static bool OverflowTest(void) {
     return res;
 }
 
-int main(){
+int main() {
+
+    assert(SimpleComposeTest());
+
     assert(SimpleAddTest());
     assert(SimpleAddMonosTest());
     assert(SimpleAtTest());
